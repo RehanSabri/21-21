@@ -1,0 +1,87 @@
+# Walkthrough: How to Change Images and Prices
+
+This guide explains where to find and update the images and prices across your e-commerce project.
+
+## 1. Product Data (Prices, Product Images, Details)
+**File location:** [src/data/products.ts](file:///c:/Users/Lenovo/OneDrive/Documents/HnMclone/src/data/products.ts)
+
+This file acts as your database. It contains an array of all products in your store. To change a product's price or its images, you just need to edit the corresponding object in this file.
+
+### What you can change here:
+*   **`price`**: The current selling price (e.g., `price: 29.99`).
+*   **`originalPrice`**: The price before a discount (optional).
+*   **`images`**: An array of image URLs used for the product.
+*   **`colors`**, **`sizes`**, **`description`**, etc.
+
+**Example:**
+```typescript
+{
+    id: "w001",
+    name: "Slim-fit Ribbed Turtleneck Sweater",
+    price: 29.99, // <-- Change price here
+    images: [
+        "https://images.unsplash.com/...", // <-- Change product images here
+        "https://images.unsplash.com/..."
+    ],
+    // ...
+}
+```
+
+---
+
+## 2. Homepage Banner and Categories
+**File location:** [src/app/page.tsx](file:///c:/Users/Lenovo/OneDrive/Documents/HnMclone/src/app/page.tsx)
+
+The landing page features several hardcoded images for the hero section, category cards, and promotional banners.
+
+### A. The Hero Banner Image
+Find the `<section aria-label="Hero banner">` block. The background image URL is defined in an inline style block:
+
+```tsx
+style={{
+    backgroundImage: "url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=90')",
+}}
+```
+
+### B. Category Cards (Women, Men, Kids, Home)
+At the top of [src/app/page.tsx](file:///c:/Users/Lenovo/OneDrive/Documents/HnMclone/src/app/page.tsx), there is a `CATEGORIES` array. You can change the image for each category card here:
+
+```tsx
+const CATEGORIES = [
+    {
+        label: "Women",
+        href: "/women",
+        image: "https://images.unsplash.com/...", // <-- Change category image here
+        description: "Discover the new collection",
+    },
+    // ...
+];
+```
+
+### C. Promotional & Sustainability Banners
+Further down in [src/app/page.tsx](file:///c:/Users/Lenovo/OneDrive/Documents/HnMclone/src/app/page.tsx), there are other sections with background images that you can replace:
+*   **Promo Banner** (Sale section): Currently uses a CSS gradient, but can be swapped for an image.
+*   **Sustainability Banner**: Uses an inline style with a background image.
+
+```tsx
+style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1600&q=80')" }}
+```
+
+---
+
+## 3. Site Logo
+**File location:** [src/components/Navbar.tsx](file:///c:/Users/Lenovo/OneDrive/Documents/HnMclone/src/components/Navbar.tsx)
+
+Currently, your website logo is text-based ("H&M" typed out with custom fonts) rather than an image. It is located around line 180:
+
+```tsx
+<Link href="/" className="...">
+    H&amp;M
+</Link>
+```
+If you ever want to replace it with an image logo, you can swap the `H&amp;M` text with an `<img />` tag.
+
+---
+### Summary
+*   **Product Prices and Images:** Edit [src/data/products.ts](file:///c:/Users/Lenovo/OneDrive/Documents/HnMclone/src/data/products.ts)
+*   **Homepage Hero and Layout Images:** Edit [src/app/page.tsx](file:///c:/Users/Lenovo/OneDrive/Documents/HnMclone/src/app/page.tsx)
