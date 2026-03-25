@@ -76,6 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const getUsers = (): (User & { password: string })[] => {
+        if (typeof window === "undefined") return SEED_USERS;
         const saved = localStorage.getItem("hm_users");
         return saved ? JSON.parse(saved) : SEED_USERS;
     };

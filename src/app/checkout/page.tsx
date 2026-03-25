@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -87,11 +88,13 @@ export default function CheckoutPage() {
             })),
         };
 
-        try {
-            const existing = JSON.parse(localStorage.getItem("hm_orders") || "[]");
-            localStorage.setItem("hm_orders", JSON.stringify([newOrder, ...existing]));
-        } catch {
-            // ignore storage errors
+        if (typeof window !== "undefined") {
+            try {
+                const existing = JSON.parse(localStorage.getItem("hm_orders") || "[]");
+                localStorage.setItem("hm_orders", JSON.stringify([newOrder, ...existing]));
+            } catch {
+                // ignore storage errors
+            }
         }
 
         clearCart();
@@ -317,7 +320,7 @@ export default function CheckoutPage() {
                                 {items.map((item) => (
                                     <div key={item.id} className="flex gap-2 text-sm">
                                         <div className="relative w-12 h-14 flex-shrink-0 bg-hm-light overflow-hidden">
-                                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                            <Image src={item.image} alt={item.name} fill sizes="48px" className="object-cover" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-medium text-xs leading-snug line-clamp-2">{item.name}</p>

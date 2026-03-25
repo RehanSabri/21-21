@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
@@ -54,14 +55,13 @@ export default function HomePage() {
         <>
             {/* Hero Banner */}
             <section className="relative h-[85vh] min-h-[500px] overflow-hidden" aria-label="Hero banner">
-                <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                        backgroundImage:
-                            "url('/photos/Whisk_3b50b2753917568ad564e5e770df901edr.jpeg')",
-                    }}
-                    role="img"
-                    aria-label="Fashion hero image"
+                <Image
+                    src="/photos/Whisk_3b50b2753917568ad564e5e770df901edr.jpeg"
+                    alt="Fashion hero image"
+                    fill
+                    sizes="100vw"
+                    priority
+                    className="object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
                 <div className="relative h-full flex items-center px-5 lg:px-20">
@@ -127,11 +127,12 @@ export default function HomePage() {
                             aria-label={`Shop ${cat.label}`}
                         >
                             <div className="aspect-[3/4] relative overflow-hidden bg-hm-light">
-                                <img
+                                <Image
                                     src={cat.image}
                                     alt={cat.label}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                    loading="lazy"
+                                    fill
+                                    sizes="(max-width: 1024px) 50vw, 25vw"
+                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                             </div>
@@ -152,12 +153,12 @@ export default function HomePage() {
                 className="relative overflow-hidden py-16 sm:py-24 px-5 sm:px-8 text-center"
                 aria-label="Sale promotion"
             >
-                <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                        backgroundImage:
-                            "url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600&q=80')",
-                    }}
+                <Image
+                    src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600&q=80"
+                    alt="Promo banner background"
+                    fill
+                    sizes="100vw"
+                    className="object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-black/60" />
                 <div className="relative z-10">
@@ -186,8 +187,8 @@ export default function HomePage() {
                     </Link>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
-                    {featuredProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                    {featuredProducts.map((product, index) => (
+                        <ProductCard key={product.id} product={product} priority={index < 4} />
                     ))}
                 </div>
             </section>
@@ -232,9 +233,12 @@ export default function HomePage() {
 
             {/* Sustainability Banner */}
             <section className="relative overflow-hidden py-20" aria-label="Sustainability">
-                <div
-                    className="absolute inset-0 bg-cover bg-center opacity-30"
-                    style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1600&q=80')" }}
+                <Image
+                    src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1600&q=80"
+                    alt="Sustainability background"
+                    fill
+                    sizes="100vw"
+                    className="object-cover object-center opacity-30"
                 />
                 <div className="relative max-w-2xl mx-auto text-center px-4">
                     <Leaf size={40} className="mx-auto mb-4 text-green-600" />

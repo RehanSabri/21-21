@@ -11,9 +11,10 @@ import { useToast } from "@/context/ToastContext";
 
 interface ProductCardProps {
     product: Product;
+    priority?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, priority = false }: ProductCardProps) {
     const { isWishlisted, toggleWishlist } = useWishlist();
     const { addItem } = useCart();
     const { showToast } = useToast();
@@ -65,7 +66,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                         fill
                         style={{ objectFit: "cover" }}
                         sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                        loading="lazy"
+                        priority={priority}
                     />
 
                     {/* Hover: second image */}

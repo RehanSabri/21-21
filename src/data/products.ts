@@ -59,7 +59,7 @@ export const products: Product[] = [
         subcategory: "Trousers",
         price: 34.99,
         images: [
-            "https://images.unsplash.com/photo-1594938298603-c8148c4b4057?w=600&q=80",
+            "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80",
             "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80",
         ],
         colors: [
@@ -150,7 +150,7 @@ export const products: Product[] = [
         subcategory: "Knitwear",
         price: 27.99,
         images: [
-            "https://images.unsplash.com/photo-1594938298603-c8148c4b4057?w=600&q=80",
+            "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80",
             "https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=600&q=80",
         ],
         colors: [
@@ -335,7 +335,7 @@ export const products: Product[] = [
         subcategory: "Suits & Blazers",
         price: 79.99,
         images: [
-            "https://images.unsplash.com/photo-1594938298603-c8148c4b4057?w=600&q=80",
+            "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80",
             "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&q=80",
         ],
         colors: [
@@ -367,7 +367,7 @@ export const products: Product[] = [
         price: 29.99,
         originalPrice: 34.99,
         images: [
-            "https://images.unsplash.com/photo-1594938298603-c8148c4b4057?w=600&q=80",
+            "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80",
             "https://images.unsplash.com/photo-1604176354204-9268737828e4?w=600&q=80",
         ],
         colors: [

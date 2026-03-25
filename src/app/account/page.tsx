@@ -46,6 +46,7 @@ interface Order {
 }
 
 const getOrdersFromStorage = (userId: string): Order[] => {
+    if (typeof window === "undefined") return [];
     try {
         const all: Order[] = JSON.parse(localStorage.getItem("hm_orders") || "[]");
         return all.filter((o) => o.userId === userId);
@@ -252,8 +253,8 @@ function AccountPageContent() {
                                                     <div className="space-y-3">
                                                         {order.items.map((item: OrderItem) => (
                                                             <div key={item.id} className="flex items-center gap-3">
-                                                                <div className="w-12 h-14 bg-hm-border flex-shrink-0 overflow-hidden">
-                                                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                                                <div className="w-12 h-14 relative bg-hm-border flex-shrink-0 overflow-hidden">
+                                                                    <Image src={item.image} alt={item.name} fill sizes="48px" className="object-cover" />
                                                                 </div>
                                                                 <div className="flex-1 min-w-0">
                                                                     <p className="text-sm font-medium line-clamp-1">{item.name}</p>

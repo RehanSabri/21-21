@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
     Search,
@@ -345,11 +346,13 @@ export default function Navbar() {
                                                 className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-hm-border last:border-b-0 ${idx === selectedIndex ? "bg-gray-50" : ""}`}
                                             >
                                                 {/* Product thumbnail */}
-                                                <div className="w-10 h-12 flex-shrink-0 bg-hm-light overflow-hidden">
-                                                    <img
+                                                <div className="relative w-10 h-12 flex-shrink-0 bg-hm-light overflow-hidden">
+                                                    <Image
                                                         src={product.images[0]}
                                                         alt={product.name}
-                                                        className="w-full h-full object-cover"
+                                                        fill
+                                                        sizes="40px"
+                                                        className="object-cover"
                                                     />
                                                 </div>
                                                 <div className="flex-1 min-w-0">

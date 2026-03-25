@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
     Shield,
@@ -35,12 +36,17 @@ export default function AdminPage() {
     }, [user, router]);
 
     const getAllUsers = () => {
+        if (typeof window === "undefined") return [];
         const usersRaw = localStorage.getItem("hm_users");
         if (!usersRaw) return [];
         return JSON.parse(usersRaw).map(({ password: _, ...u }: { password: string;[key: string]: unknown }) => u);
     };
 
-    const [allUsers] = useState<ReturnType<typeof getAllUsers>>(getAllUsers);
+    const [allUsers, setAllUsers] = useState<ReturnType<typeof getAllUsers>>([]);
+
+    useEffect(() => {
+        setAllUsers(getAllUsers());
+    }, []);
 
     const filteredUsers = allUsers.filter(
         (u: { name: string; email: string }) =>
@@ -236,9 +242,11 @@ export default function AdminPage() {
                                     <tr key={p.id} className="border-b border-hm-border hover:bg-hm-light/50 transition-colors">
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">
-                                                <img
+                                                <Image
                                                     src={p.images[0]}
                                                     alt={p.name}
+                                                    width={40}
+                                                    height={48}
                                                     className="w-10 h-12 object-cover bg-hm-light flex-shrink-0"
                                                 />
                                                 <span className="font-medium line-clamp-2 max-w-[200px]">{p.name}</span>
