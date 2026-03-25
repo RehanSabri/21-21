@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Eye, EyeOff, User, Lock, Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-export default function LoginPage() {
+function LoginPageContent() {
     const { login, register, user } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -251,5 +251,13 @@ export default function LoginPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <React.Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center">Loading...</div>}>
+            <LoginPageContent />
+        </React.Suspense>
     );
 }

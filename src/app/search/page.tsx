@@ -14,7 +14,7 @@ const SORT_OPTIONS = [
     { label: "Newest", value: "new" },
 ];
 
-export default function SearchPage() {
+function SearchPageContent() {
     const searchParams = useSearchParams();
     const query = searchParams.get("q") || "";
     
@@ -129,5 +129,13 @@ export default function SearchPage() {
                 </>
             )}
         </div>
+    );
+}
+
+export default function SearchPage() {
+    return (
+        <React.Suspense fallback={<div className="min-h-[60vh] flex items-center justify-center">Loading search results...</div>}>
+            <SearchPageContent />
+        </React.Suspense>
     );
 }

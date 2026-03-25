@@ -54,7 +54,7 @@ const getOrdersFromStorage = (userId: string): Order[] => {
     }
 };
 
-export default function AccountPage() {
+function AccountPageContent() {
     const { user, logout, updateUser, addAddress, removeAddress } = useAuth();
     const { wishlist } = useWishlist();
     const router = useRouter();
@@ -371,5 +371,13 @@ export default function AccountPage() {
                 </main>
             </div>
         </div>
+    );
+}
+
+export default function AccountPage() {
+    return (
+        <React.Suspense fallback={<div className="min-h-[60vh] flex items-center justify-center">Loading account details...</div>}>
+            <AccountPageContent />
+        </React.Suspense>
     );
 }
