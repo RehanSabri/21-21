@@ -55,7 +55,7 @@ export default function CheckoutPage() {
         cvc: "",
     });
 
-    const delivery = shippingMethod === "express" ? 5.99 : subtotal >= 40 ? 0 : 3.99;
+    const delivery = shippingMethod === "express" ? 599 : subtotal >= 4000 ? 0 : 399;
     const total = subtotal + delivery;
 
     const stepIdx = STEPS.findIndex((s) => s.id === step);
@@ -201,7 +201,7 @@ export default function CheckoutPage() {
                                         <p className="text-xs text-hm-gray">3–5 business days</p>
                                     </div>
                                     <span className="font-semibold text-sm">
-                                        {subtotal >= 40 ? <span className="text-green-600">FREE</span> : "£3.99"}
+                                        {subtotal >= 4000 ? <span className="text-green-600">FREE</span> : "₹399"}
                                     </span>
                                 </label>
                                 <label className={`flex items-center gap-4 p-4 border-2 cursor-pointer transition-colors ${shippingMethod === "express" ? "border-hm-dark" : "border-hm-border hover:border-hm-gray"}`}>
@@ -210,7 +210,7 @@ export default function CheckoutPage() {
                                         <p className="font-semibold text-sm">Express Delivery</p>
                                         <p className="text-xs text-hm-gray">1–2 business days</p>
                                     </div>
-                                    <span className="font-semibold text-sm">£5.99</span>
+                                    <span className="font-semibold text-sm">₹599</span>
                                 </label>
                             </div>
                             <div className="flex gap-3 mt-6">
@@ -280,7 +280,7 @@ export default function CheckoutPage() {
                                     className="btn-red gap-2 text-sm"
                                     disabled={paymentMethod === "card" && (!cardForm.name || !cardForm.number || !cardForm.expiry || !cardForm.cvc)}
                                 >
-                                    Place Order · £{total.toFixed(2)}
+                                    Place Order · ₹{total.toLocaleString('en-IN')}
                                 </button>
                             </div>
                         </div>
@@ -326,24 +326,24 @@ export default function CheckoutPage() {
                                             <p className="font-medium text-xs leading-snug line-clamp-2">{item.name}</p>
                                             <p className="text-xs text-hm-gray">{item.size} · x{item.quantity}</p>
                                         </div>
-                                        <span className="text-xs font-semibold flex-shrink-0">£{(item.price * item.quantity).toFixed(2)}</span>
+                                        <span className="text-xs font-semibold flex-shrink-0">₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
                                     </div>
                                 ))}
                             </div>
                             <div className="border-t border-hm-border pt-3 space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-hm-gray">Subtotal</span>
-                                    <span>£{subtotal.toFixed(2)}</span>
+                                    <span>₹{subtotal.toLocaleString('en-IN')}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-hm-gray">Delivery</span>
                                     <span className={delivery === 0 ? "text-green-600" : ""}>
-                                        {delivery === 0 ? "FREE" : `£${delivery.toFixed(2)}`}
+                                        {delivery === 0 ? "FREE" : `₹${delivery.toLocaleString('en-IN')}`}
                                     </span>
                                 </div>
                                 <div className="flex justify-between font-bold text-base pt-2 border-t border-hm-border">
                                     <span>Total</span>
-                                    <span>£{total.toFixed(2)}</span>
+                                    <span>₹{total.toLocaleString('en-IN')}</span>
                                 </div>
                             </div>
                         </div>

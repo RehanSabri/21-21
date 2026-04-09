@@ -238,7 +238,7 @@ function AccountPageContent() {
                                                         }`}>
                                                         {order.status}
                                                     </span>
-                                                    <p className="text-sm font-bold">£{order.total.toFixed(2)}</p>
+                                                    <p className="text-sm font-bold">₹{order.total.toLocaleString('en-IN')}</p>
                                                     <button
                                                         onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
                                                         className="text-xs text-hm-gray hover:text-hm-dark underline transition-colors"
@@ -260,13 +260,13 @@ function AccountPageContent() {
                                                                     <p className="text-sm font-medium line-clamp-1">{item.name}</p>
                                                                     <p className="text-xs text-hm-gray">{item.color} · {item.size} · ×{item.quantity}</p>
                                                                 </div>
-                                                                <span className="text-sm font-semibold flex-shrink-0">£{(item.price * item.quantity).toFixed(2)}</span>
+                                                                <span className="text-sm font-semibold flex-shrink-0">₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
                                                             </div>
                                                         ))}
                                                     </div>
                                                     <div className="flex justify-between text-sm font-bold pt-3 mt-3 border-t border-hm-border">
                                                         <span>Total</span>
-                                                        <span>£{order.total.toFixed(2)}</span>
+                                                        <span>₹{order.total.toLocaleString('en-IN')}</span>
                                                     </div>
                                                 </div>
                                             )}

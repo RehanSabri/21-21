@@ -40,7 +40,7 @@ const CATEGORIES = [
 ];
 
 const PERKS = [
-    { Icon: Truck, title: "Free Delivery", desc: "On orders over £40" },
+    { Icon: Truck, title: "Free Delivery", desc: "On orders over ₹4,000" },
     { Icon: RotateCcw, title: "Free Returns", desc: "Easy 30-day returns" },
     { Icon: Shield, title: "Secure Payment", desc: "100% secure checkout" },
     { Icon: Leaf, title: "Sustainable", desc: "Conscious choices" },

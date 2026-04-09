@@ -19,10 +19,10 @@ const SORT_OPTIONS = [
 
 const ALL_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
 const PRICE_RANGES = [
-    { label: "Under £20", min: 0, max: 20 },
-    { label: "£20 – £40", min: 20, max: 40 },
-    { label: "£40 – £60", min: 40, max: 60 },
-    { label: "Over £60", min: 60, max: Infinity },
+    { label: "Under ₹2,000", min: 0, max: 2000 },
+    { label: "₹2,000 – ₹4,000", min: 2000, max: 4000 },
+    { label: "₹4,000 – ₹6,000", min: 4000, max: 6000 },
+    { label: "Over ₹6,000", min: 6000, max: Infinity },
 ];
 
 export default function CategoryClient({ category }: CategoryClientProps) {

@@ -26,7 +26,7 @@ export const products: Product[] = [
         name: "Embroidered Horizontal Stripes Polo Sweater",
         category: "women",
         subcategory: "Knitwear",
-        price: 29.99,
+        price: 2999,
         images: [
             "/photos/img2.1.webp",
             "/photos/img2.2.webp",
@@ -57,7 +57,7 @@ export const products: Product[] = [
         name: "Wide-leg Linen Trousers",
         category: "women",
         subcategory: "Trousers",
-        price: 34.99,
+        price: 3499,
         images: [
             "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80",
             "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80",
@@ -87,8 +87,8 @@ export const products: Product[] = [
         name: "Floral Wrap Dress",
         category: "women",
         subcategory: "Dresses",
-        price: 39.99,
-        originalPrice: 59.99,
+        price: 3999,
+        originalPrice: 5999,
         images: [
             "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600&q=80",
             "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&q=80",
@@ -118,7 +118,7 @@ export const products: Product[] = [
         name: "Oversized Denim Jacket",
         category: "women",
         subcategory: "Jackets",
-        price: 49.99,
+        price: 4999,
         images: [
             "/photos/img3.2.webp",
             "/photos/img3.1.webp",
@@ -148,7 +148,7 @@ export const products: Product[] = [
         name: "V-Neck Knit Cardigan",
         category: "women",
         subcategory: "Knitwear",
-        price: 27.99,
+        price: 2799,
         images: [
             "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80",
             "https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=600&q=80",
@@ -179,8 +179,8 @@ export const products: Product[] = [
         name: "High-Waist Skinny Jeans",
         category: "women",
         subcategory: "Jeans",
-        price: 44.99,
-        originalPrice: 54.99,
+        price: 4499,
+        originalPrice: 5499,
         images: [
             "https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?w=600&q=80",
             "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600&q=80",
@@ -211,7 +211,7 @@ export const products: Product[] = [
         name: "Regular Fit Oxford Shirt",
         category: "men",
         subcategory: "Shirts",
-        price: 24.99,
+        price: 2499,
         images: [
             "/photos/img1.1.webp",
             "/photos/img1.3.webp",
@@ -241,7 +241,7 @@ export const products: Product[] = [
         name: "Slim-fit Chino Trousers",
         category: "men",
         subcategory: "Trousers",
-        price: 34.99,
+        price: 3499,
         images: [
             "https://images.unsplash.com/photo-1604176354204-9268737828e4?w=600&q=80",
             "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=600&q=80",
@@ -271,8 +271,8 @@ export const products: Product[] = [
         name: "Merino Wool Crewneck Sweater",
         category: "men",
         subcategory: "Knitwear",
-        price: 59.99,
-        originalPrice: 79.99,
+        price: 5999,
+        originalPrice: 7999,
         images: [
             "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&q=80",
             "https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?w=600&q=80",
@@ -302,7 +302,7 @@ export const products: Product[] = [
         name: "Regular-fit T-shirt",
         category: "men",
         subcategory: "T-shirts",
-        price: 9.99,
+        price: 999,
         images: [
             "/photos/img4.1.webp",
             "/photos/img4.2.webp",
@@ -333,7 +333,7 @@ export const products: Product[] = [
         name: "Slim-fit Suit Jacket",
         category: "men",
         subcategory: "Suits & Blazers",
-        price: 79.99,
+        price: 7999,
         images: [
             "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80",
             "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&q=80",
@@ -364,8 +364,8 @@ export const products: Product[] = [
         name: "Relaxed-fit Cargo Shorts",
         category: "men",
         subcategory: "Shorts",
-        price: 29.99,
-        originalPrice: 34.99,
+        price: 2999,
+        originalPrice: 3499,
         images: [
             "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80",
             "https://images.unsplash.com/photo-1604176354204-9268737828e4?w=600&q=80",
@@ -396,7 +396,7 @@ export const products: Product[] = [
         name: "Hooded Sweatshirt (Kids)",
         category: "kids",
         subcategory: "Tops",
-        price: 19.99,
+        price: 1999,
         images: [
             "https://images.unsplash.com/photo-1519457431-44ccd64a579b?w=600&q=80",
             "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600&q=80",
@@ -427,7 +427,7 @@ export const products: Product[] = [
         name: "Printed Cotton Leggings (Kids)",
         category: "kids",
         subcategory: "Bottoms",
-        price: 9.99,
+        price: 999,
         images: [
             "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600&q=80",
             "https://images.unsplash.com/photo-1519457431-44ccd64a579b?w=600&q=80",
@@ -456,7 +456,7 @@ export const products: Product[] = [
         name: "Denim Dungarees (Kids)",
         category: "kids",
         subcategory: "Bottoms",
-        price: 24.99,
+        price: 2499,
         images: [
             "https://images.unsplash.com/photo-1519457431-44ccd64a579b?w=600&q=80",
             "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=600&q=80",
@@ -486,8 +486,8 @@ export const products: Product[] = [
         name: "Unicorn Print Pyjama Set",
         category: "kids",
         subcategory: "Nightwear",
-        price: 17.99,
-        originalPrice: 22.99,
+        price: 1799,
+        originalPrice: 2299,
         images: [
             "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=600&q=80",
             "https://images.unsplash.com/photo-1519457431-44ccd64a579b?w=600&q=80",
@@ -517,7 +517,7 @@ export const products: Product[] = [
         name: "Washed Linen Duvet Cover Set",
         category: "home",
         subcategory: "Bedding",
-        price: 69.99,
+        price: 6999,
         images: [
             "https://images.unsplash.com/photo-1540479859555-17af45c78602?w=600&q=80",
             "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
@@ -547,7 +547,7 @@ export const products: Product[] = [
         name: "Stoneware Mug Set (4-pack)",
         category: "home",
         subcategory: "Dining",
-        price: 24.99,
+        price: 2499,
         images: [
             "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&q=80",
             "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
@@ -577,8 +577,8 @@ export const products: Product[] = [
         name: "Abstract Canvas Wall Art",
         category: "home",
         subcategory: "Art & Decor",
-        price: 39.99,
-        originalPrice: 49.99,
+        price: 3999,
+        originalPrice: 4999,
         images: [
             "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=600&q=80",
             "https://images.unsplash.com/photo-1549887552-cb1071d3e5ca?w=600&q=80",
@@ -607,7 +607,7 @@ export const products: Product[] = [
         name: "Organic Cotton Throw Blanket",
         category: "home",
         subcategory: "Textiles",
-        price: 29.99,
+        price: 2999,
         images: [
             "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
             "https://images.unsplash.com/photo-1540479859555-17af45c78602?w=600&q=80",

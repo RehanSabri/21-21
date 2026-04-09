@@ -224,11 +224,11 @@ export default function ProductDetailClient() {
                     <div className="flex items-center gap-3 mb-6">
                         {product.originalPrice && (
                             <span className="text-lg text-hm-gray line-through">
-                                £{product.originalPrice.toFixed(2)}
+                                ₹{product.originalPrice.toLocaleString('en-IN')}
                             </span>
                         )}
                         <span className={`text-2xl font-bold ${product.isSale ? "text-hm-red" : "text-hm-dark"}`}>
-                            £{product.price.toFixed(2)}
+                            ₹{product.price.toLocaleString('en-IN')}
                         </span>
                         {product.isSale && product.originalPrice && (
                             <span className="text-xs font-bold text-white bg-hm-red px-2 py-0.5">
@@ -314,7 +314,7 @@ export default function ProductDetailClient() {
                     <div className="space-y-2 mb-6 py-4 border-t border-b border-hm-border">
                         <div className="flex items-center gap-2 text-sm">
                             <Truck size={16} className="text-green-600" />
-                            <span>Free delivery on orders over £40</span>
+                            <span>Free delivery on orders over ₹4,000</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                             <RotateCcw size={16} className="text-hm-gray" />
@@ -371,8 +371,8 @@ export default function ProductDetailClient() {
                             )}
                             {activeTab === "delivery" && (
                                 <div className="space-y-3 text-sm text-hm-gray">
-                                    <p><strong className="text-hm-dark">Standard Delivery</strong> – £3.99 (Free over £40) · 3–5 business days</p>
-                                    <p><strong className="text-hm-dark">Express Delivery</strong> – £5.99 · 1–2 business days</p>
+                                    <p><strong className="text-hm-dark">Standard Delivery</strong> – ₹399 (Free over ₹4,000) · 3–5 business days</p>
+                                    <p><strong className="text-hm-dark">Express Delivery</strong> – ₹599 · 1–2 business days</p>
                                     <p><strong className="text-hm-dark">Returns</strong> – Free within 30 days. Items must be unworn with tags attached.</p>
                                 </div>
                             )}

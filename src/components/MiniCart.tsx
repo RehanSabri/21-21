@@ -62,7 +62,7 @@ export default function MiniCart({ onClose }: MiniCartProps) {
                                     <p className="text-xs text-hm-gray mb-1">
                                         {item.color} · {item.size}
                                     </p>
-                                    <p className="text-sm font-semibold">£{item.price.toFixed(2)}</p>
+                                    <p className="text-sm font-semibold">₹{item.price.toLocaleString('en-IN')}</p>
                                     <div className="flex items-center gap-2 mt-2">
                                         <button
                                             onClick={() => updateQty(item.id, item.quantity - 1)}
@@ -98,17 +98,17 @@ export default function MiniCart({ onClose }: MiniCartProps) {
                     <div className="p-5 border-t border-hm-border space-y-3">
                         <div className="flex justify-between text-sm">
                             <span className="text-hm-gray">Subtotal</span>
-                            <span className="font-semibold">£{subtotal.toFixed(2)}</span>
+                            <span className="font-semibold">₹{subtotal.toLocaleString('en-IN')}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-hm-gray">Delivery</span>
                             <span className="font-semibold text-green-600">
-                                {subtotal >= 40 ? "FREE" : "£3.99"}
+                                {subtotal >= 4000 ? "FREE" : "₹399"}
                             </span>
                         </div>
                         <div className="flex justify-between font-bold text-base border-t border-hm-border pt-3">
                             <span>Total</span>
-                            <span>£{(subtotal + (subtotal >= 40 ? 0 : 3.99)).toFixed(2)}</span>
+                            <span>₹{(subtotal + (subtotal >= 4000 ? 0 : 399)).toLocaleString('en-IN')}</span>
                         </div>
                         <Link href="/cart" onClick={onClose} className="btn-secondary w-full text-xs text-center block">
                             View Bag

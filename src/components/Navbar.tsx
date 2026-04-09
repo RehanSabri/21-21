@@ -151,7 +151,7 @@ export default function Navbar() {
         <>
             {/* Promo Banner */}
             <div className="bg-hm-dark text-white text-center py-2 text-[10px] sm:text-xs font-medium tracking-widest uppercase px-4 truncate">
-                Free delivery on orders over £40 · Free returns on all orders
+                Free delivery on orders over ₹4,000 · Free returns on all orders
             </div>
 
             {/* Main Navbar */}
@@ -363,7 +363,7 @@ export default function Navbar() {
                                                     <p className="text-xs text-hm-gray capitalize">{product.category} · {product.subcategory}</p>
                                                 </div>
                                                 <span className="text-sm font-semibold text-hm-dark flex-shrink-0">
-                                                    £{product.price.toFixed(2)}
+                                                    ₹{product.price.toLocaleString('en-IN')}
                                                 </span>
                                             </button>
                                         ))}

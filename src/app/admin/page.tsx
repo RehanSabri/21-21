@@ -254,7 +254,7 @@ export default function AdminPage() {
                                         </td>
                                         <td className="p-4 capitalize">{p.category}</td>
                                         <td className="p-4">
-                                            £{p.price.toFixed(2)}
+                                            ₹{p.price.toLocaleString('en-IN')}
                                             {p.originalPrice && (
                                                 <span className="text-hm-red text-xs ml-1">(-{Math.round((1 - p.price / p.originalPrice) * 100)}%)</span>
                                             )}

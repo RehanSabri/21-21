@@ -175,14 +175,14 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
                 <div className="flex items-center gap-2 mt-1">
                     {product.originalPrice && (
                         <span className="text-sm text-hm-gray line-through">
-                            £{product.originalPrice.toFixed(2)}
+                            ₹{product.originalPrice.toLocaleString('en-IN')}
                         </span>
                     )}
                     <span
                         className={`text-sm font-semibold ${product.isSale ? "text-hm-red" : "text-hm-dark"
                             }`}
                     >
-                        £{product.price.toFixed(2)}
+                        ₹{product.price.toLocaleString('en-IN')}
                     </span>
                 </div>
             </div>

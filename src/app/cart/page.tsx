@@ -18,7 +18,7 @@ import { useCart } from "@/context/CartContext";
 
 const PROMO_CODES: Record<string, { type: "percent" | "fixed"; value: number; label: string }> = {
     SAVE10: { type: "percent", value: 10, label: "10% off" },
-    WELCOME: { type: "fixed", value: 5, label: "£5 off" },
+    WELCOME: { type: "fixed", value: 500, label: "₹500 off" },
     HNM20: { type: "percent", value: 20, label: "20% off" },
 };
 
@@ -51,7 +51,7 @@ export default function CartPage() {
             : Math.min(appliedPromo.value, subtotal)
         : 0;
 
-    const delivery = subtotal - discount >= 40 ? 0 : 3.99;
+    const delivery = subtotal - discount >= 4000 ? 0 : 399;
     const total = subtotal - discount + delivery;
 
     return (
@@ -113,7 +113,7 @@ export default function CartPage() {
                                             </button>
                                         </div>
                                         <p className="font-semibold">
-                                            £{(item.price * item.quantity).toFixed(2)}
+                                            ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                                         </p>
                                     </div>
                                 </div>
@@ -143,31 +143,31 @@ export default function CartPage() {
                             <div className="space-y-3 mb-5 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-hm-gray">Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items)</span>
-                                    <span>£{subtotal.toFixed(2)}</span>
+                                    <span>₹{subtotal.toLocaleString('en-IN')}</span>
                                 </div>
                                 {discount > 0 && (
                                     <div className="flex justify-between text-green-600">
                                         <span className="flex items-center gap-1">
                                             <Tag size={12} /> Discount ({appliedPromo?.label})
                                         </span>
-                                        <span className="font-medium">-£{discount.toFixed(2)}</span>
+                                        <span className="font-medium">-₹{discount.toLocaleString('en-IN')}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between">
                                     <span className="text-hm-gray">Delivery</span>
                                     <span className={delivery === 0 ? "text-green-600 font-medium" : ""}>
-                                        {delivery === 0 ? "FREE" : `£${delivery.toFixed(2)}`}
+                                        {delivery === 0 ? "FREE" : `₹${delivery.toLocaleString('en-IN')}`}
                                     </span>
                                 </div>
                                 {delivery > 0 && (
                                     <p className="text-xs text-hm-gray bg-hm-light p-2">
-                                        Add £{(40 - (subtotal - discount)).toFixed(2)} more for free delivery
+                                        Add ₹{(4000 - (subtotal - discount)).toLocaleString('en-IN')} more for free delivery
                                     </p>
                                 )}
                             </div>
                             <div className="flex justify-between font-bold text-lg pt-4 border-t border-hm-border mb-6">
                                 <span>Total</span>
-                                <span>£{total.toFixed(2)}</span>
+                                <span>₹{total.toLocaleString('en-IN')}</span>
                             </div>
 
                             {/* Promo Code */}
