@@ -18,7 +18,7 @@ import {
     ChevronUp,
     X,
 } from "lucide-react";
-import { getProductById, getRelatedProducts } from "@/data/products";
+import { useProducts } from "@/context/ProductsContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useToast } from "@/context/ToastContext";
@@ -28,6 +28,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 export default function ProductDetailClient() {
     const params = useParams();
     const productId = params?.productId as string;
+    const { getProductById, getRelatedProducts } = useProducts();
     const product = getProductById(productId);
 
     const { addItem } = useCart();

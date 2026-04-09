@@ -3,7 +3,8 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { SlidersHorizontal, X, ChevronDown, ChevronUp } from "lucide-react";
-import { products, Product } from "@/data/products";
+import { Product } from "@/data/products";
+import { useProducts } from "@/context/ProductsContext";
 import ProductCard from "@/components/ProductCard";
 
 interface CategoryClientProps {
@@ -26,6 +27,7 @@ const PRICE_RANGES = [
 ];
 
 export default function CategoryClient({ category }: CategoryClientProps) {
+    const { products, isHydrated } = useProducts();
     const [sortBy, setSortBy] = useState("bestseller");
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
     const [selectedPriceRanges, setSelectedPriceRanges] = useState<number[]>([]);
@@ -65,7 +67,7 @@ export default function CategoryClient({ category }: CategoryClientProps) {
                     return (b.isBestSeller ? 1 : 0) - (a.isBestSeller ? 1 : 0);
             }
         });
-    }, [category, sortBy, selectedSizes, selectedPriceRanges]);
+    }, [products, category, sortBy, selectedSizes, selectedPriceRanges]);
 
     const toggleSize = (size: string) =>
         setSelectedSizes((prev) =>
@@ -298,7 +300,7 @@ export default function CategoryClient({ category }: CategoryClientProps) {
                         </div>
                     ) : (
                         <div
-                            className={`grid gap-4 lg:gap-6 ${showFilters
+                            className={`grid gap-4 lg:gap-6 transition-opacity duration-300 ${!isHydrated ? "opacity-0" : "opacity-100"} ${showFilters
                                     ? "grid-cols-2 lg:grid-cols-3"
                                     : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
                                 }`}

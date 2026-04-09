@@ -2,8 +2,8 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
+import HomeProductSections from "@/components/HomeProductSections";
 import { ArrowRight, Leaf, Truck, RotateCcw, Shield } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -47,9 +47,6 @@ const PERKS = [
 ];
 
 export default function HomePage() {
-    const featuredProducts = products.filter((p) => p.isBestSeller).slice(0, 4);
-    const newArrivals = products.filter((p) => p.isNew).slice(0, 4);
-    const saleProducts = products.filter((p) => p.isSale).slice(0, 4);
 
     return (
         <>
@@ -175,61 +172,7 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Best Sellers */}
-            <section className="max-w-[1400px] mx-auto px-4 py-10 sm:py-16" aria-label="Best sellers">
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-2">
-                    <div>
-                        <h2 className="text-2xl sm:text-3xl font-bold">Best Sellers</h2>
-                        <p className="text-hm-gray text-sm mt-1">Our most loved pieces</p>
-                    </div>
-                    <Link href="/women" className="text-sm font-semibold flex items-center gap-1 hover:text-hm-red transition-colors">
-                        View All <ArrowRight size={14} />
-                    </Link>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
-                    {featuredProducts.map((product, index) => (
-                        <ProductCard key={product.id} product={product} priority={index < 4} />
-                    ))}
-                </div>
-            </section>
-
-            {/* New Arrivals */}
-            <section className="bg-hm-light py-10 sm:py-16" aria-label="New arrivals">
-                <div className="max-w-[1400px] mx-auto px-4">
-                    <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-2">
-                        <div>
-                            <h2 className="text-2xl sm:text-3xl font-bold">New Arrivals</h2>
-                            <p className="text-hm-gray text-sm mt-1">Fresh styles just dropped</p>
-                        </div>
-                        <Link href="/women?filter=new" className="text-sm font-semibold flex items-center gap-1 hover:text-hm-red transition-colors">
-                            View All <ArrowRight size={14} />
-                        </Link>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
-                        {newArrivals.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Sale Section */}
-            <section className="max-w-[1400px] mx-auto px-4 py-10 sm:py-16" aria-label="Sale products">
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-2">
-                    <div>
-                        <h2 className="text-2xl sm:text-3xl font-bold text-hm-red">On Sale Now</h2>
-                        <p className="text-hm-gray text-sm mt-1">Discounts on selected styles</p>
-                    </div>
-                    <Link href="/sale" className="text-sm font-semibold flex items-center gap-1 text-hm-red hover:opacity-75 transition-opacity">
-                        Shop All Sale <ArrowRight size={14} />
-                    </Link>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
-                    {saleProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-            </section>
+            <HomeProductSections />
 
             {/* Sustainability Banner */}
             <section className="relative overflow-hidden py-20" aria-label="Sustainability">

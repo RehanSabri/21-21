@@ -6,6 +6,7 @@ import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { ToastProvider } from "@/context/ToastContext";
+import { ProductsProvider } from "@/context/ProductsContext";
 
 export const metadata: Metadata = {
     title: {
@@ -36,6 +37,7 @@ export default function RootLayout({
                 <a href="#main-content" className="skip-link">
                     Skip to main content
                 </a>
+                <ProductsProvider>
                 <AuthProvider>
                     <CartProvider>
                         <WishlistProvider>
@@ -49,6 +51,7 @@ export default function RootLayout({
                         </WishlistProvider>
                     </CartProvider>
                 </AuthProvider>
+                </ProductsProvider>
             </body>
         </html>
     );
