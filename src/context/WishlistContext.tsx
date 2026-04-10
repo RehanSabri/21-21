@@ -13,7 +13,7 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | null>(null);
 
-const LS_KEY = "hm_wishlist";
+const LS_KEY = "2121_wishlist";
 function getLocal(): string[] {
     if (typeof window === "undefined") return [];
     try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch { return []; }

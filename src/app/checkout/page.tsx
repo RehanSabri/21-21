@@ -102,7 +102,7 @@ export default function CheckoutPage() {
                         key: razorpayKey,
                         amount: orderData.amount,
                         currency: orderData.currency,
-                        name: "H&M Clone",
+                        name: "21:21",
                         description: `Order – ${items.length} item(s)`,
                         order_id: orderData.orderId,
                         prefill: {

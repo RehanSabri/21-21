@@ -220,6 +220,11 @@ body {
   background: #fff;
 }
 
+/* When an icon is placed inside the input wrapper, pl-10 adds left padding */
+.input-field.pl-10 {
+  padding-left: 2.5rem;
+}
+
 .input-field:focus {
   border-color: var(--hm-dark);
 }

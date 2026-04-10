@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Product, getProductById } from "@/data/products";
 
-const STORAGE_KEY = "hm_recently_viewed";
+const STORAGE_KEY = "2121_recently_viewed";
 const MAX_ITEMS = 8;
 
 export function useRecentlyViewed() {

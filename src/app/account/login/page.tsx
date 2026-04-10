@@ -71,7 +71,7 @@ function LoginPageContent() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="text-4xl font-black text-hm-dark" style={{ fontFamily: "Georgia, serif", letterSpacing: "-2px" }}>
-                        H&amp;M
+                        21:21
                     </Link>
                     <p className="text-hm-gray text-sm mt-2">
                         {tab === "login" ? "Welcome back" : "Create your account"}
@@ -111,7 +111,7 @@ function LoginPageContent() {
                         <div>
                             <label htmlFor="login-email" className="text-sm font-medium mb-1 block">Email Address</label>
                             <div className="relative">
-                                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-hm-gray" />
+                                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-hm-gray pointer-events-none" />
                                 <input
                                     id="login-email"
                                     type="email"

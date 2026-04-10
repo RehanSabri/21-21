@@ -28,7 +28,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | null>(null);
 
 // ── Local storage helpers (guest cart) ──────────────────────
-const LS_KEY = "hm_cart";
+const LS_KEY = "2121_cart";
 
 function getLocalCart(): CartItem[] {
     if (typeof window === "undefined") return [];
