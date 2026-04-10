@@ -1,11 +1,18 @@
 import { Metadata } from "next";
-import { getProductById } from "@/data/products";
+import { createClient } from "@/lib/supabase/server";
 import ProductDetailClient from "@/components/ProductDetailClient";
 
-type ProductParams = { category: string; productId: string };
+type Props = { params: Promise<{ category: string; productId: string }> };
 
-export async function generateMetadata({ params }: { params: ProductParams }): Promise<Metadata> {
-    const product = getProductById(params.productId);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { productId } = await params;
+    const supabase = await createClient();
+    const { data: product } = await supabase
+        .from("products")
+        .select("name, description, images")
+        .eq("id", productId)
+        .single();
+
     if (!product) return { title: "Product Not Found" };
     return {
         title: product.name,
@@ -13,7 +20,7 @@ export async function generateMetadata({ params }: { params: ProductParams }): P
         openGraph: {
             title: product.name,
             description: product.description,
-            images: [product.images[0]],
+            images: product.images?.[0] ? [product.images[0]] : [],
         },
     };
 }

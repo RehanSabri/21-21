@@ -28,7 +28,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 export default function ProductDetailClient() {
     const params = useParams();
     const productId = params?.productId as string;
-    const { getProductById, getRelatedProducts } = useProducts();
+    const { getProductById, getRelatedProducts, isHydrated } = useProducts();
     const product = getProductById(productId);
 
     const { addItem } = useCart();
@@ -82,6 +82,15 @@ export default function ProductDetailClient() {
             showToast("Review submitted successfully!");
         }, 600);
     };
+
+    // Wait for Supabase products to load before showing 404
+    if (!isHydrated) {
+        return (
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-hm-dark border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
 
     if (!product) return notFound() as never;
 
