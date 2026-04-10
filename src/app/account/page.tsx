@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { products, getProductById } from "@/data/products";
+import { useProducts } from "@/context/ProductsContext";
 import ProductCard from "@/components/ProductCard";
 
 type Tab = "profile" | "orders" | "wishlist" | "addresses";
@@ -36,28 +36,20 @@ interface OrderItem {
 
 interface Order {
     id: string;
-    userId: string;
-    date: string;
+    user_id: string;
+    created_at: string;
     status: string;
     total: number;
-    shippingMethod: string;
-    address: string;
-    items: OrderItem[];
+    shipping_method: string;
+    address_snapshot: { line1: string; city: string; postcode: string };
+    order_items: OrderItem[];
 }
 
-const getOrdersFromStorage = (userId: string): Order[] => {
-    if (typeof window === "undefined") return [];
-    try {
-        const all: Order[] = JSON.parse(localStorage.getItem("hm_orders") || "[]");
-        return all.filter((o) => o.userId === userId);
-    } catch {
-        return [];
-    }
-};
 
 function AccountPageContent() {
-    const { user, logout, updateUser, addAddress, removeAddress } = useAuth();
+    const { user, logout, updateUser, addAddress, removeAddress, loading } = useAuth();
     const { wishlist } = useWishlist();
+    const { products: allProducts } = useProducts();
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -68,17 +60,22 @@ function AccountPageContent() {
     const [editingProfile, setEditingProfile] = useState(false);
     const [profileForm, setProfileForm] = useState({ name: "", email: "" });
     const [showAddAddress, setShowAddAddress] = useState(false);
-    const [addrForm, setAddrForm] = useState({ line1: "", line2: "", city: "", postcode: "", country: "United Kingdom", isDefault: false });
+    const [addrForm, setAddrForm] = useState({ line1: "", line2: "", city: "", postcode: "", country: "India", is_default: false });
     const [savedMsg, setSavedMsg] = useState(false);
     const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
 
     useEffect(() => {
-        if (!user) router.push("/account/login");
-    }, [user, router]);
+        if (!loading && !user) router.push("/account/login");
+    }, [user, loading, router]);
 
     useEffect(() => {
-        if (user) setOrders(getOrdersFromStorage(user.id));
+        if (user) {
+            fetch("/api/orders")
+                .then((r) => r.json())
+                .then((data) => setOrders(Array.isArray(data) ? data : []))
+                .catch(() => setOrders([]));
+        }
     }, [user]);
 
     useEffect(() => {
@@ -86,8 +83,17 @@ function AccountPageContent() {
     }, [user]);
 
     const wishlistProducts = wishlist
-        .map((id) => getProductById(id))
-        .filter(Boolean) as ReturnType<typeof getProductById>[];
+        .map((id) => allProducts.find((p) => p.id === id))
+        .filter(Boolean) as NonNullable<ReturnType<typeof allProducts.find>>[];
+
+    // Show spinner while auth is loading (prevents flash redirect)
+    if (loading) {
+        return (
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-hm-dark border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
 
     if (!user) return null;
 
@@ -101,9 +107,9 @@ function AccountPageContent() {
 
     const handleAddAddress = (e: React.FormEvent) => {
         e.preventDefault();
-        addAddress(addrForm as Parameters<typeof addAddress>[0]);
+        addAddress(addrForm);
         setShowAddAddress(false);
-        setAddrForm({ line1: "", line2: "", city: "", postcode: "", country: "United Kingdom", isDefault: false });
+        setAddrForm({ line1: "", line2: "", city: "", postcode: "", country: "India", is_default: false });
     };
 
     const TABS = [
@@ -122,7 +128,7 @@ function AccountPageContent() {
                     <p className="text-hm-gray text-sm">Welcome back, {user.name}</p>
                 </div>
                 <button
-                    onClick={() => { logout(); router.push("/"); }}
+                    onClick={async () => { await logout(); router.push("/"); }}
                     className="flex items-center gap-2 text-sm text-hm-gray hover:text-hm-red transition-colors"
                 >
                     <LogOut size={16} /> Sign out
@@ -229,9 +235,9 @@ function AccountPageContent() {
                                         <div key={order.id} className="border border-hm-border">
                                             <div className="flex items-center justify-between p-4">
                                                 <div>
-                                                    <p className="font-semibold text-sm">Order #{order.id}</p>
-                                                    <p className="text-xs text-hm-gray">{order.date} · {order.items.length} item{order.items.length !== 1 ? "s" : ""}</p>
-                                                    {order.address && <p className="text-xs text-hm-gray truncate max-w-[200px]">{order.address}</p>}
+                                                    <p className="font-semibold text-sm">Order #{order.id.slice(0, 8).toUpperCase()}</p>
+                                                    <p className="text-xs text-hm-gray">{order.created_at?.split('T')[0]} · {order.order_items?.length ?? 0} item{(order.order_items?.length ?? 0) !== 1 ? "s" : ""}</p>
+                                                    {order.address_snapshot?.line1 && <p className="text-xs text-hm-gray truncate max-w-[200px]">{order.address_snapshot.line1}, {order.address_snapshot.city}</p>}
                                                 </div>
                                                 <div className="text-right flex flex-col items-end gap-2">
                                                     <span className={`text-xs font-semibold px-2 py-1 ${order.status === "Delivered" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
@@ -251,7 +257,7 @@ function AccountPageContent() {
                                                 <div className="border-t border-hm-border p-4 bg-hm-light/40 animate-fadeIn">
                                                     <p className="text-xs font-semibold uppercase tracking-wider text-hm-gray mb-3">Items</p>
                                                     <div className="space-y-3">
-                                                        {order.items.map((item: OrderItem) => (
+                                                        {(order.order_items ?? []).map((item: OrderItem) => (
                                                             <div key={item.id} className="flex items-center gap-3">
                                                                 <div className="w-12 h-14 relative bg-hm-border flex-shrink-0 overflow-hidden">
                                                                     <Image src={item.image} alt={item.name} fill sizes="48px" className="object-cover" />
@@ -327,7 +333,7 @@ function AccountPageContent() {
                                         </div>
                                         <div className="col-span-2">
                                             <label className="text-xs font-medium mb-1 block flex items-center gap-2">
-                                                <input type="checkbox" className="accent-hm-dark" checked={addrForm.isDefault} onChange={(e) => setAddrForm({ ...addrForm, isDefault: e.target.checked })} />
+                                                <input type="checkbox" className="accent-hm-dark" checked={addrForm.is_default} onChange={(e) => setAddrForm({ ...addrForm, is_default: e.target.checked })} />
                                                 Set as default address
                                             </label>
                                         </div>
@@ -349,7 +355,7 @@ function AccountPageContent() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {user.addresses.map((addr) => (
                                         <div key={addr.id} className="border border-hm-border p-4 relative">
-                                            {addr.isDefault && (
+                                            {addr.is_default && (
                                                 <span className="absolute top-3 right-3 text-xs font-bold bg-hm-dark text-white px-2 py-0.5">Default</span>
                                             )}
                                             <p className="font-medium text-sm mb-1">{addr.line1}</p>

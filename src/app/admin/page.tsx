@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useProducts } from "@/context/ProductsContext";
-import { Product } from "@/data/products";
+
+type Product = ReturnType<typeof useProducts>["products"][number];
 
 type AdminTab = "overview" | "users" | "products";
 type Category = "women" | "men" | "kids" | "home";
@@ -467,18 +468,23 @@ export default function AdminPage() {
         if (user.role !== "admin") router.push("/account");
     }, [user, router]);
 
-    const getAllUsers = () => {
-        if (typeof window === "undefined") return [];
-        const raw = localStorage.getItem("hm_users");
-        if (!raw) return [];
-        return JSON.parse(raw).map(({ password: _, ...u }: { password: string; [k: string]: unknown }) => u);
-    };
-    const [allUsers, setAllUsers] = useState<ReturnType<typeof getAllUsers>>([]);
-    useEffect(() => { setAllUsers(getAllUsers()); }, []);
+    interface AdminUser { id: string; name: string; role: string; phone?: string; created_at: string; }
+    const [allUsers, setAllUsers] = useState<AdminUser[]>([]);
+    const [usersLoading, setUsersLoading] = useState(false);
 
-    const filteredUsers = allUsers.filter((u: { name: string; email: string }) =>
-        u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
-        u.email.toLowerCase().includes(userSearch.toLowerCase())
+    useEffect(() => {
+        if (tab === "users" && user?.role === "admin") {
+            setUsersLoading(true);
+            fetch("/api/admin/users")
+                .then((r) => r.json())
+                .then((data) => setAllUsers(Array.isArray(data) ? data : []))
+                .catch(() => setAllUsers([]))
+                .finally(() => setUsersLoading(false));
+        }
+    }, [tab, user]);
+
+    const filteredUsers = allUsers.filter((u) =>
+        u.name.toLowerCase().includes(userSearch.toLowerCase())
     );
 
     const filteredProducts = products.filter((p) =>
@@ -486,25 +492,41 @@ export default function AdminPage() {
         p.category.includes(productSearch.toLowerCase())
     );
 
-    const handleSave = (data: Omit<Product, "id">) => {
+    const [saveError, setSaveError] = useState<string | null>(null);
+
+    const handleSave = async (data: Omit<Product, "id">) => {
+        setSaveError(null);
+        let result;
         if (editProduct) {
-            updateProduct(editProduct.id, data);
+            result = await updateProduct(editProduct.id, data);
         } else {
-            addProduct(data);
+            result = await addProduct(data);
         }
-        setShowForm(false);
-        setEditProduct(null);
-        setSavedFlash(true);
-        setTimeout(() => setSavedFlash(false), 2500);
+        if (result.ok) {
+            setShowForm(false);
+            setEditProduct(null);
+            setSavedFlash(true);
+            setTimeout(() => setSavedFlash(false), 2500);
+        } else {
+            setSaveError(result.error ?? "Something went wrong. Please try again.");
+        }
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (deleteTarget) {
-            deleteProduct(deleteTarget.id);
+            await deleteProduct(deleteTarget.id);
             setDeleteTarget(null);
         }
     };
 
+    const { loading } = useAuth();
+    if (loading) {
+        return (
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-hm-dark border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
     if (!user || user.role !== "admin") return null;
 
     const STATS = [
@@ -537,6 +559,14 @@ export default function AdminPage() {
                 <div className="mb-4 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-4 py-3 text-sm animate-fadeIn">
                     <Check size={16} />
                     Product saved successfully! Changes are now live on the site.
+                </div>
+            )}
+            {/* Error flash */}
+            {saveError && (
+                <div className="mb-4 flex items-center gap-2 bg-red-50 border border-red-200 text-hm-red px-4 py-3 text-sm animate-fadeIn">
+                    <AlertTriangle size={16} />
+                    {saveError}
+                    <button onClick={() => setSaveError(null)} className="ml-auto"><X size={14} /></button>
                 </div>
             )}
 
@@ -617,19 +647,25 @@ export default function AdminPage() {
                             <input type="search" placeholder="Search users..." className="input-field pl-9 py-2 text-sm w-56" value={userSearch} onChange={(e) => setUserSearch(e.target.value)} aria-label="Search users" />
                         </div>
                     </div>
+                    {usersLoading ? (
+                        <div className="flex justify-center py-12">
+                            <div className="w-6 h-6 border-2 border-hm-dark border-t-transparent rounded-full animate-spin" />
+                        </div>
+                    ) : (
                     <div className="border border-hm-border overflow-x-auto">
                         <table className="w-full text-sm" role="grid" aria-label="Users table">
                             <thead>
                                 <tr className="bg-hm-light border-b border-hm-border">
                                     <th className="text-left p-4 font-semibold">Name</th>
-                                    <th className="text-left p-4 font-semibold">Email</th>
                                     <th className="text-left p-4 font-semibold">Role</th>
+                                    <th className="text-left p-4 font-semibold">Phone</th>
                                     <th className="text-left p-4 font-semibold">Joined</th>
-                                    <th className="text-left p-4 font-semibold">Addresses</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredUsers.map((u: { id: string; name: string; email: string; role: string; joinedDate: string; addresses: unknown[] }) => (
+                                {filteredUsers.length === 0 ? (
+                                    <tr><td colSpan={4} className="p-8 text-center text-hm-gray text-sm">No users found.</td></tr>
+                                ) : filteredUsers.map((u) => (
                                     <tr key={u.id} className="border-b border-hm-border hover:bg-hm-light/50 transition-colors">
                                         <td className="p-4">
                                             <div className="flex items-center gap-2">
@@ -639,19 +675,19 @@ export default function AdminPage() {
                                                 {u.name}
                                             </div>
                                         </td>
-                                        <td className="p-4 text-hm-gray">{u.email}</td>
                                         <td className="p-4">
                                             <span className={`px-2 py-0.5 text-xs font-bold uppercase ${u.role === "admin" ? "bg-hm-red text-white" : "bg-hm-light text-hm-dark border border-hm-border"}`}>
                                                 {u.role}
                                             </span>
                                         </td>
-                                        <td className="p-4 text-hm-gray">{u.joinedDate}</td>
-                                        <td className="p-4 text-hm-gray">{u.addresses?.length ?? 0}</td>
+                                        <td className="p-4 text-hm-gray">{u.phone ?? "—"}</td>
+                                        <td className="p-4 text-hm-gray">{u.created_at?.split("T")[0]}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
+                    )}
                 </div>
             )}
 

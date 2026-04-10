@@ -29,22 +29,20 @@ function LoginPageContent() {
         if (user) router.push("/account");
     }, [user, router]);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         setLoading(true);
-        setTimeout(() => {
-            const success = login(loginForm.email, loginForm.password);
-            if (success) {
-                router.push("/account");
-            } else {
-                setError("Invalid email or password. Try: jane@example.com / password123");
-            }
-            setLoading(false);
-        }, 500);
+        const { error: err } = await login(loginForm.email, loginForm.password);
+        if (err) {
+            setError(err);
+        } else {
+            router.push("/account");
+        }
+        setLoading(false);
     };
 
-    const handleRegister = (e: React.FormEvent) => {
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         if (registerForm.password !== registerForm.confirm) {
@@ -56,15 +54,15 @@ function LoginPageContent() {
             return;
         }
         setLoading(true);
-        setTimeout(() => {
-            const success = register(registerForm.name, registerForm.email, registerForm.password);
-            if (success) {
-                router.push("/account");
-            } else {
-                setError("An account with this email already exists.");
-            }
-            setLoading(false);
-        }, 500);
+        const { error: err, needsConfirmation } = await register(registerForm.name, registerForm.email, registerForm.password);
+        if (err) {
+            setError(err);
+        } else if (needsConfirmation) {
+            setError("📧 Check your email and click the confirmation link to activate your account.");
+        } else {
+            router.push("/account");
+        }
+        setLoading(false);
     };
 
     return (
@@ -162,11 +160,6 @@ function LoginPageContent() {
                         <button type="submit" disabled={loading} className="btn-primary w-full py-4 text-sm disabled:opacity-50">
                             {loading ? "Signing in..." : "Sign In"}
                         </button>
-                        <div className="text-center text-xs text-hm-gray">
-                            <p className="mb-1">Demo credentials:</p>
-                            <p><strong>jane@example.com</strong> / password123</p>
-                            <p><strong>admin@hnm.com</strong> / admin123</p>
-                        </div>
                     </form>
                 )}
 

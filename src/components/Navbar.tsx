@@ -22,7 +22,6 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import MiniCart from "./MiniCart";
-import { searchProducts, Product } from "@/data/products";
 
 const NAV_LINKS = [
     {
@@ -50,6 +49,15 @@ const NAV_LINKS = [
 
 const POPULAR_SEARCHES = ["Dresses", "Jeans", "Sweaters", "Jackets", "Sale items"];
 
+interface ProductSuggestion {
+    id: string;
+    name: string;
+    category: string;
+    subcategory: string;
+    price: number;
+    images: string[];
+}
+
 export default function Navbar() {
     const { totalItems } = useCart();
     const { user, logout } = useAuth();
@@ -60,7 +68,7 @@ export default function Navbar() {
     const [cartOpen, setCartOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [suggestions, setSuggestions] = useState<Product[]>([]);
+    const [suggestions, setSuggestions] = useState<ProductSuggestion[]>([]);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
@@ -94,16 +102,21 @@ export default function Navbar() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Live search suggestions
+    // Live search suggestions — debounced API fetch
     useEffect(() => {
         const trimmed = searchQuery.trim();
-        if (trimmed.length >= 2) {
-            const results = searchProducts(trimmed).slice(0, 5);
-            setSuggestions(results);
-        } else {
+        if (trimmed.length < 2) {
             setSuggestions([]);
+            setSelectedIndex(-1);
+            return;
         }
-        setSelectedIndex(-1);
+        const timer = setTimeout(() => {
+            fetch(`/api/products?search=${encodeURIComponent(trimmed)}`)
+                .then((r) => r.json())
+                .then((data: ProductSuggestion[]) => setSuggestions(Array.isArray(data) ? data.slice(0, 5) : []))
+                .catch(() => setSuggestions([]));
+        }, 250);
+        return () => clearTimeout(timer);
     }, [searchQuery]);
 
     const handleSearch = (e: React.FormEvent) => {
@@ -119,7 +132,7 @@ export default function Navbar() {
         }
     };
 
-    const handleSuggestionClick = (product: Product) => {
+    const handleSuggestionClick = (product: ProductSuggestion) => {
         router.push(`/search?q=${encodeURIComponent(product.name)}`);
         setSearchOpen(false);
         setSearchQuery("");
@@ -257,7 +270,7 @@ export default function Navbar() {
                                                         <Shield size={16} /> Admin Panel
                                                     </Link>
                                                 )}
-                                                <button onClick={() => { logout(); setUserMenuOpen(false); }} className="flex items-center gap-2 w-full px-4 py-3 text-sm hover:bg-gray-50 transition-colors border-t border-hm-border">
+                                                <button onClick={async () => { await logout(); setUserMenuOpen(false); }} className="flex items-center gap-2 w-full px-4 py-3 text-sm hover:bg-gray-50 transition-colors border-t border-hm-border">
                                                     <LogOut size={16} /> Sign out
                                                 </button>
                                             </>
@@ -452,7 +465,7 @@ export default function Navbar() {
                             {user ? (
                                 <div>
                                     <p className="text-sm font-semibold mb-1">{user.name}</p>
-                                    <button onClick={() => { logout(); setMobileOpen(false); }} className="text-sm text-hm-gray flex items-center gap-2">
+                                    <button onClick={async () => { await logout(); setMobileOpen(false); }} className="text-sm text-hm-gray flex items-center gap-2">
                                         <LogOut size={14} /> Sign out
                                     </button>
                                 </div>

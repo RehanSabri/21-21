@@ -1,15 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-
-export interface User {
-    id: string;
-    name: string;
-    email: string;
-    role: "user" | "admin";
-    joinedDate: string;
-    addresses: Address[];
-}
+import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
+import { createClient } from "@/lib/supabase/client";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 export interface Address {
     id: string;
@@ -18,137 +11,182 @@ export interface Address {
     city: string;
     postcode: string;
     country: string;
-    isDefault: boolean;
+    is_default: boolean;
+}
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    role: "user" | "admin";
+    phone?: string;
+    joinedDate: string;
+    addresses: Address[];
 }
 
 interface AuthContextType {
     user: User | null;
-    login: (email: string, password: string) => boolean;
-    register: (name: string, email: string, password: string) => boolean;
-    logout: () => void;
-    updateUser: (updates: Partial<User>) => void;
-    addAddress: (address: Omit<Address, "id">) => void;
-    removeAddress: (id: string) => void;
+    loading: boolean;
+    login: (email: string, password: string) => Promise<{ error: string | null }>;
+    register: (name: string, email: string, password: string) => Promise<{ error: string | null; needsConfirmation: boolean }>;
+    logout: () => Promise<void>;
+    updateUser: (updates: Partial<Pick<User, "name" | "phone">>) => Promise<void>;
+    addAddress: (address: Omit<Address, "id">) => Promise<void>;
+    removeAddress: (id: string) => Promise<void>;
+    refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const SEED_USERS: (User & { password: string })[] = [
-    {
-        id: "admin001",
-        name: "Admin User",
-        email: "admin@hnm.com",
-        password: "admin123",
-        role: "admin",
-        joinedDate: "2024-01-01",
-        addresses: [],
-    },
-    {
-        id: "user001",
-        name: "Jane Doe",
-        email: "jane@example.com",
-        password: "password123",
-        role: "user",
-        joinedDate: "2024-06-15",
-        addresses: [
-            {
-                id: "addr001",
-                line1: "42 Fashion Street",
-                city: "London",
-                postcode: "W1F 7QA",
-                country: "United Kingdom",
-                isDefault: true,
-            },
-        ],
-    },
-];
+async function fetchProfile(
+    supabase: ReturnType<typeof createClient>,
+    sbUser: SupabaseUser
+): Promise<User | null> {
+    const [{ data: profile }, { data: addresses }] = await Promise.all([
+        supabase.from("profiles").select("name, role, phone, created_at").eq("id", sbUser.id).single(),
+        supabase.from("addresses").select("*").eq("user_id", sbUser.id).order("created_at"),
+    ]);
+
+    if (!profile) {
+        // Profile might not exist yet (race condition after sign-up).
+        // Try to create it via the API and retry once.
+        try {
+            await fetch("/api/user/profile", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: sbUser.user_metadata?.name || sbUser.email?.split("@")[0] || "User" }),
+            });
+            const { data: retryProfile } = await supabase
+                .from("profiles")
+                .select("name, role, phone, created_at")
+                .eq("id", sbUser.id)
+                .single();
+            if (!retryProfile) return null;
+            return {
+                id: sbUser.id,
+                email: sbUser.email ?? "",
+                name: retryProfile.name,
+                role: retryProfile.role as "user" | "admin",
+                phone: retryProfile.phone ?? undefined,
+                joinedDate: (retryProfile.created_at as string).split("T")[0],
+                addresses: [],
+            };
+        } catch {
+            return null;
+        }
+    }
+
+    return {
+        id: sbUser.id,
+        email: sbUser.email ?? "",
+        name: profile.name,
+        role: profile.role as "user" | "admin",
+        phone: profile.phone ?? undefined,
+        joinedDate: (profile.created_at as string).split("T")[0],
+        addresses: (addresses ?? []) as Address[],
+    };
+}
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    // Memoize — one client instance for the lifetime of the provider
+    const supabase = useMemo(() => createClient(), []);
+
+    const refreshUser = async () => {
+        const { data: { user: sbUser } } = await supabase.auth.getUser();
+        if (sbUser) {
+            const profile = await fetchProfile(supabase, sbUser);
+            setUser(profile);
+        } else {
+            setUser(null);
+        }
+    };
 
     useEffect(() => {
-        const saved = localStorage.getItem("hm_user");
-        if (saved) setUser(JSON.parse(saved));
-        // seed if not already done
-        if (!localStorage.getItem("hm_users")) {
-            localStorage.setItem("hm_users", JSON.stringify(SEED_USERS));
-        }
-    }, []);
+        // Initial session check
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
+            if (session?.user) {
+                const profile = await fetchProfile(supabase, session.user);
+                setUser(profile);
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
 
-    const getUsers = (): (User & { password: string })[] => {
-        if (typeof window === "undefined") return SEED_USERS;
-        const saved = localStorage.getItem("hm_users");
-        return saved ? JSON.parse(saved) : SEED_USERS;
-    };
-
-    const login = (email: string, password: string): boolean => {
-        const users = getUsers();
-        const found = users.find(
-            (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+        // Listen for auth state changes (login, logout, token refresh)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            async (event, session) => {
+                if (session?.user) {
+                    const profile = await fetchProfile(supabase, session.user);
+                    setUser(profile);
+                } else {
+                    setUser(null);
+                }
+                setLoading(false);
+            }
         );
-        if (found) {
-            const { password: _, ...userData } = found;
-            setUser(userData);
-            localStorage.setItem("hm_user", JSON.stringify(userData));
-            return true;
-        }
-        return false;
+
+        return () => subscription.unsubscribe();
+    // supabase is memoized — safe to include
+    }, [supabase]);
+
+    const login = async (email: string, password: string) => {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) return { error: error.message };
+        return { error: null };
     };
 
-    const register = (name: string, email: string, password: string): boolean => {
-        const users = getUsers();
-        if (users.find((u) => u.email.toLowerCase() === email.toLowerCase())) return false;
-        const newUser: User & { password: string } = {
-            id: `user_${Date.now()}`,
-            name,
+    const register = async (name: string, email: string, password: string) => {
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
-            role: "user",
-            joinedDate: new Date().toISOString().split("T")[0],
-            addresses: [],
-        };
-        const updatedUsers = [...users, newUser];
-        localStorage.setItem("hm_users", JSON.stringify(updatedUsers));
-        const { password: _, ...userData } = newUser;
-        setUser(userData);
-        localStorage.setItem("hm_user", JSON.stringify(userData));
-        return true;
+            options: { data: { name } },
+        });
+        if (error) return { error: error.message, needsConfirmation: false };
+        if (!data.session) return { error: null, needsConfirmation: true };
+        return { error: null, needsConfirmation: false };
     };
 
-    const logout = () => {
+    const logout = async () => {
         setUser(null);
-        localStorage.removeItem("hm_user");
+        await fetch("/api/auth/signout", { method: "POST" });
+        // Full page reload so middleware clears the session cookie and resets all state
+        window.location.href = "/";
     };
 
-    const updateUser = (updates: Partial<User>) => {
+    const updateUser = async (updates: Partial<Pick<User, "name" | "phone">>) => {
         if (!user) return;
-        const updated = { ...user, ...updates };
-        setUser(updated);
-        localStorage.setItem("hm_user", JSON.stringify(updated));
-        // also update in users store
-        const users = getUsers();
-        const newUsers = users.map((u) =>
-            u.id === user.id ? { ...u, ...updates } : u
-        );
-        localStorage.setItem("hm_users", JSON.stringify(newUsers));
+        const res = await fetch("/api/user/profile", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updates),
+        });
+        if (res.ok) await refreshUser();
     };
 
-    const addAddress = (address: Omit<Address, "id">) => {
+    const addAddress = async (address: Omit<Address, "id">) => {
         if (!user) return;
-        const newAddr: Address = { ...address, id: `addr_${Date.now()}` };
-        const addresses = address.isDefault
-            ? [...user.addresses.map((a) => ({ ...a, isDefault: false })), newAddr]
-            : [...user.addresses, newAddr];
-        updateUser({ addresses });
+        await fetch("/api/user/addresses", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(address),
+        });
+        await refreshUser();
     };
 
-    const removeAddress = (id: string) => {
+    const removeAddress = async (id: string) => {
         if (!user) return;
-        updateUser({ addresses: user.addresses.filter((a) => a.id !== id) });
+        await fetch(`/api/user/addresses?id=${id}`, { method: "DELETE" });
+        await refreshUser();
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, updateUser, addAddress, removeAddress }}>
+        <AuthContext.Provider
+            value={{ user, loading, login, register, logout, updateUser, addAddress, removeAddress, refreshUser }}
+        >
             {children}
         </AuthContext.Provider>
     );

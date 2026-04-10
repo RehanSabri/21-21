@@ -16,6 +16,14 @@ import {
     Lock,
 } from "lucide-react";
 
+// Extend the global window for the Razorpay script
+declare global {
+    interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Razorpay: any;
+    }
+}
+
 type Step = "address" | "shipping" | "payment" | "confirmation";
 
 const STEPS: { id: Step; label: string; Icon: React.ElementType }[] = [
@@ -31,9 +39,9 @@ export default function CheckoutPage() {
     const router = useRouter();
 
     const [step, setStep] = useState<Step>("address");
-    const [orderNumber] = useState(
-        `HM${Math.floor(Math.random() * 900000) + 100000}`
-    );
+    const [confirmedOrderId, setConfirmedOrderId] = useState<string | null>(null);
+    const [processing, setProcessing] = useState(false);
+    const [payError, setPayError] = useState<string | null>(null);
 
     const [addressForm, setAddressForm] = useState({
         firstName: "",
@@ -42,63 +50,144 @@ export default function CheckoutPage() {
         line2: "",
         city: "",
         postcode: "",
-        country: "United Kingdom",
+        country: "India",
         phone: "",
     });
 
     const [shippingMethod, setShippingMethod] = useState<"standard" | "express">("standard");
-    const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("card");
-    const [cardForm, setCardForm] = useState({
-        name: "",
-        number: "",
-        expiry: "",
-        cvc: "",
-    });
 
     const delivery = shippingMethod === "express" ? 599 : subtotal >= 4000 ? 0 : 399;
     const total = subtotal + delivery;
 
     const stepIdx = STEPS.findIndex((s) => s.id === step);
-
     const nextStep = () => {
         const steps: Step[] = ["address", "shipping", "payment", "confirmation"];
         const next = steps[steps.indexOf(step) + 1];
         if (next) setStep(next);
     };
 
-    const placeOrder = () => {
-        // Save the order to localStorage before clearing the cart
-        const newOrder = {
-            id: orderNumber,
-            userId: user?.id ?? "guest",
-            date: new Date().toISOString().split("T")[0],
-            status: "Processing",
-            total: parseFloat(total.toFixed(2)),
-            shippingMethod,
-            address: `${addressForm.line1}, ${addressForm.city}, ${addressForm.postcode}`,
-            items: items.map((item) => ({
-                id: item.id,
-                productId: item.productId,
-                name: item.name,
-                image: item.image,
-                color: item.color,
-                size: item.size,
-                quantity: item.quantity,
-                price: item.price,
-            })),
-        };
+    const loadRazorpayScript = (): Promise<boolean> =>
+        new Promise((resolve) => {
+            if (window.Razorpay) return resolve(true);
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
 
-        if (typeof window !== "undefined") {
-            try {
-                const existing = JSON.parse(localStorage.getItem("hm_orders") || "[]");
-                localStorage.setItem("hm_orders", JSON.stringify([newOrder, ...existing]));
-            } catch {
-                // ignore storage errors
+    const handlePayment = async () => {
+        setProcessing(true);
+        setPayError(null);
+
+        const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+        const hasRazorpay = razorpayKey && !razorpayKey.startsWith("rzp_test_xxx");
+
+        try {
+            if (hasRazorpay) {
+                // ── Real Razorpay flow ──────────────────────────────
+                const loaded = await loadRazorpayScript();
+                if (!loaded) throw new Error("Could not load Razorpay. Please check your connection.");
+
+                const orderRes = await fetch("/api/payments/create-order", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: total }),
+                });
+                const orderData = await orderRes.json();
+                if (!orderRes.ok) throw new Error(orderData.error || "Failed to create payment order");
+
+                await new Promise<void>((resolve, reject) => {
+                    const rzp = new window.Razorpay({
+                        key: razorpayKey,
+                        amount: orderData.amount,
+                        currency: orderData.currency,
+                        name: "H&M Clone",
+                        description: `Order – ${items.length} item(s)`,
+                        order_id: orderData.orderId,
+                        prefill: {
+                            name: `${addressForm.firstName} ${addressForm.lastName}`,
+                            email: user?.email ?? "",
+                            contact: addressForm.phone,
+                        },
+                        theme: { color: "#222222" },
+                        handler: async (response: {
+                            razorpay_order_id: string;
+                            razorpay_payment_id: string;
+                            razorpay_signature: string;
+                        }) => {
+                            try {
+                                const verifyRes = await fetch("/api/payments/verify", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                        razorpayOrderId: response.razorpay_order_id,
+                                        razorpayPaymentId: response.razorpay_payment_id,
+                                        razorpaySignature: response.razorpay_signature,
+                                        items: items.map((item) => ({
+                                            productId: item.productId,
+                                            name: item.name,
+                                            image: item.image,
+                                            price: item.price,
+                                            quantity: item.quantity,
+                                            size: item.size,
+                                            color: item.color,
+                                        })),
+                                        shippingMethod,
+                                        subtotal,
+                                        deliveryFee: delivery,
+                                        total,
+                                        address: addressForm,
+                                    }),
+                                });
+                                const verifyData = await verifyRes.json();
+                                if (!verifyRes.ok) throw new Error(verifyData.error || "Payment verification failed");
+                                await clearCart();
+                                setConfirmedOrderId(verifyData.orderId);
+                                setStep("confirmation");
+                                resolve();
+                            } catch (err) {
+                                reject(err);
+                            }
+                        },
+                        modal: { ondismiss: () => reject(new Error("Payment cancelled")) },
+                    });
+                    rzp.open();
+                });
+            } else {
+                // ── Fallback: save order directly (no payment) ──────
+                const res = await fetch("/api/orders", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        items: items.map((item) => ({
+                            productId: item.productId,
+                            name: item.name,
+                            image: item.image,
+                            price: item.price,
+                            quantity: item.quantity,
+                            size: item.size,
+                            color: item.color,
+                        })),
+                        shippingMethod,
+                        subtotal,
+                        deliveryFee: delivery,
+                        total,
+                        address: addressForm,
+                    }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Failed to place order");
+                await clearCart();
+                setConfirmedOrderId(data.id);
+                setStep("confirmation");
             }
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Payment failed";
+            if (msg !== "Payment cancelled") setPayError(msg);
+        } finally {
+            setProcessing(false);
         }
-
-        clearCart();
-        setStep("confirmation");
     };
 
     if (items.length === 0 && step !== "confirmation") {
@@ -167,11 +256,11 @@ export default function CheckoutPage() {
                                 <div className="col-span-2">
                                     <label className="text-sm font-medium mb-1 block" htmlFor="country">Country</label>
                                     <select id="country" className="input-field" value={addressForm.country} onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}>
+                                        <option>India</option>
                                         <option>United Kingdom</option>
                                         <option>United States</option>
                                         <option>Germany</option>
                                         <option>France</option>
-                                        <option>India</option>
                                     </select>
                                 </div>
                                 <div className="col-span-2">
@@ -225,62 +314,52 @@ export default function CheckoutPage() {
                     {/* Step 3: Payment */}
                     {step === "payment" && (
                         <div className="animate-fadeIn">
-                            <h2 className="text-xl font-bold mb-6">Payment</h2>
-                            <div className="flex gap-3 mb-6">
-                                <button onClick={() => setPaymentMethod("card")} className={`flex-1 py-3 text-sm font-medium border-2 transition-colors ${paymentMethod === "card" ? "border-hm-dark" : "border-hm-border"}`}>
-                                    💳 Credit / Debit Card
-                                </button>
-                                <button onClick={() => setPaymentMethod("paypal")} className={`flex-1 py-3 text-sm font-medium border-2 transition-colors ${paymentMethod === "paypal" ? "border-hm-dark" : "border-hm-border"}`}>
-                                    🅿 PayPal
-                                </button>
+                            <h2 className="text-xl font-bold mb-6">Review & Place Order</h2>
+                            <div className="border-2 border-hm-border p-6 mb-6 bg-hm-light">
+                                {process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID && !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID.startsWith("rzp_test_xxx") ? (
+                                    <>
+                                        <p className="font-semibold mb-2">Secure Checkout via Razorpay</p>
+                                        <p className="text-sm text-hm-gray mb-4">
+                                            Supports UPI, Credit/Debit Cards, Net Banking, Wallets &amp; EMI.
+                                        </p>
+                                        <div className="flex gap-2 flex-wrap text-xs text-hm-gray">
+                                            {["UPI", "Visa", "Mastercard", "RuPay", "Net Banking", "Wallets"].map((m) => (
+                                                <span key={m} className="border border-hm-border px-2 py-1 rounded">{m}</span>
+                                            ))}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p className="font-semibold mb-2">Review your order</p>
+                                        <p className="text-sm text-hm-gray">
+                                            Click &ldquo;Place Order&rdquo; to confirm. Payment integration will be added soon.
+                                        </p>
+                                    </>
+                                )}
                             </div>
 
-                            {paymentMethod === "card" && (
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="text-sm font-medium mb-1 block" htmlFor="cardName">Name on Card *</label>
-                                        <input id="cardName" className="input-field" placeholder="Jane Doe" value={cardForm.name} onChange={(e) => setCardForm({ ...cardForm, name: e.target.value })} />
-                                    </div>
-                                    <div>
-                                        <label className="text-sm font-medium mb-1 block" htmlFor="cardNumber">Card Number *</label>
-                                        <input id="cardNumber" className="input-field" placeholder="1234 5678 9012 3456" maxLength={19} value={cardForm.number} onChange={(e) => {
-                                            const v = e.target.value.replace(/\D/g, "").slice(0, 16);
-                                            const formatted = v.replace(/(\d{4})(?=\d)/g, "$1 ");
-                                            setCardForm({ ...cardForm, number: formatted });
-                                        }} />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block" htmlFor="cardExpiry">Expiry Date *</label>
-                                            <input id="cardExpiry" className="input-field" placeholder="MM/YY" maxLength={5} value={cardForm.expiry} onChange={(e) => setCardForm({ ...cardForm, expiry: e.target.value })} />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block" htmlFor="cardCvc">CVC *</label>
-                                            <input id="cardCvc" className="input-field" placeholder="123" maxLength={3} value={cardForm.cvc} onChange={(e) => setCardForm({ ...cardForm, cvc: e.target.value })} />
-                                        </div>
-                                    </div>
-                                </div>
+                            {payError && (
+                                <p className="text-red-600 text-sm mb-4 p-3 bg-red-50 border border-red-200 rounded">
+                                    {payError}
+                                </p>
                             )}
 
-                            {paymentMethod === "paypal" && (
-                                <div className="bg-[#FFC439]/20 border-2 border-[#FFC439] p-6 text-center rounded">
-                                    <p className="font-semibold mb-2">You will be redirected to PayPal</p>
-                                    <p className="text-sm text-hm-gray">Complete your payment securely through PayPal.</p>
-                                </div>
-                            )}
-
-                            <p className="flex items-center gap-2 text-xs text-hm-gray mt-4">
+                            <p className="flex items-center gap-2 text-xs text-hm-gray mb-6">
                                 <Lock size={12} /> Your payment information is encrypted and secure.
                             </p>
 
-                            <div className="flex gap-3 mt-6">
-                                <button onClick={() => setStep("shipping")} className="btn-secondary text-sm">Back</button>
+                            <div className="flex gap-3">
+                                <button onClick={() => setStep("shipping")} className="btn-secondary text-sm" disabled={processing}>Back</button>
                                 <button
-                                    onClick={placeOrder}
-                                    className="btn-red gap-2 text-sm"
-                                    disabled={paymentMethod === "card" && (!cardForm.name || !cardForm.number || !cardForm.expiry || !cardForm.cvc)}
+                                    onClick={handlePayment}
+                                    disabled={processing}
+                                    className="btn-red gap-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
-                                    Place Order · ₹{total.toLocaleString('en-IN')}
+                                    {processing ? "Processing…" : (
+                                        process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID && !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID.startsWith("rzp_test_xxx")
+                                            ? `Pay ₹${total.toLocaleString("en-IN")} via Razorpay`
+                                            : `Place Order — ₹${total.toLocaleString("en-IN")}`
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -294,13 +373,15 @@ export default function CheckoutPage() {
                             </div>
                             <h2 className="text-2xl font-bold mb-2">Order Confirmed!</h2>
                             <p className="text-hm-gray mb-4">
-                                Thank you for your purchase. Your order number is:
+                                Thank you for your purchase. Your order has been received.
                             </p>
-                            <p className="text-2xl font-mono font-bold text-hm-red mb-6">
-                                {orderNumber}
-                            </p>
+                            {confirmedOrderId && (
+                                <p className="text-sm font-mono font-bold text-hm-red mb-6 break-all">
+                                    Order ID: {confirmedOrderId}
+                                </p>
+                            )}
                             <p className="text-sm text-hm-gray mb-8 max-w-sm mx-auto">
-                                You'll receive an email confirmation shortly. Your items will be delivered within{" "}
+                                You can track your order in your account. Your items will be delivered within{" "}
                                 {shippingMethod === "express" ? "1–2" : "3–5"} business days.
                             </p>
                             <div className="flex justify-center gap-3">
@@ -326,24 +407,24 @@ export default function CheckoutPage() {
                                             <p className="font-medium text-xs leading-snug line-clamp-2">{item.name}</p>
                                             <p className="text-xs text-hm-gray">{item.size} · x{item.quantity}</p>
                                         </div>
-                                        <span className="text-xs font-semibold flex-shrink-0">₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
+                                        <span className="text-xs font-semibold flex-shrink-0">₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
                                     </div>
                                 ))}
                             </div>
                             <div className="border-t border-hm-border pt-3 space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-hm-gray">Subtotal</span>
-                                    <span>₹{subtotal.toLocaleString('en-IN')}</span>
+                                    <span>₹{subtotal.toLocaleString("en-IN")}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-hm-gray">Delivery</span>
                                     <span className={delivery === 0 ? "text-green-600" : ""}>
-                                        {delivery === 0 ? "FREE" : `₹${delivery.toLocaleString('en-IN')}`}
+                                        {delivery === 0 ? "FREE" : `₹${delivery.toLocaleString("en-IN")}`}
                                     </span>
                                 </div>
                                 <div className="flex justify-between font-bold text-base pt-2 border-t border-hm-border">
                                     <span>Total</span>
-                                    <span>₹{total.toLocaleString('en-IN')}</span>
+                                    <span>₹{total.toLocaleString("en-IN")}</span>
                                 </div>
                             </div>
                         </div>

@@ -8,6 +8,9 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { ProductsProvider } from "@/context/ProductsContext";
 
+// Opt out of static rendering — pages need Supabase (env vars set at runtime)
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
     title: {
         default: "21:21 | Fashion and quality at the best price",
