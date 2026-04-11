@@ -19,11 +19,11 @@ export default function HomeProductSections() {
             <section className="max-w-[1400px] mx-auto px-4 py-10 sm:py-16" aria-label="Best sellers">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-2">
                     <div>
-                        <h2 className="text-2xl sm:text-3xl font-bold">Best Sellers</h2>
-                        <p className="text-hm-gray text-sm mt-1">Our most loved pieces</p>
+                        <p className="label-tag mb-1">Best Sellers</p>
+                        <h2 className="display-heading text-2xl sm:text-3xl">Our Picks</h2>
                     </div>
-                    <Link href="/women" className="text-sm font-semibold flex items-center gap-1 hover:text-hm-red transition-colors">
-                        View All <ArrowRight size={14} />
+                    <Link href="/women" className="text-[11px] font-semibold uppercase tracking-[0.12em] flex items-center gap-1 hover:text-hm-red transition-colors">
+                        View All <ArrowRight size={13} />
                     </Link>
                 </div>
                 <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 transition-opacity duration-300 ${!isHydrated ? "opacity-0" : "opacity-100"}`}>
@@ -38,11 +38,11 @@ export default function HomeProductSections() {
                 <div className="max-w-[1400px] mx-auto px-4">
                     <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-2">
                         <div>
-                            <h2 className="text-2xl sm:text-3xl font-bold">New Arrivals</h2>
-                            <p className="text-hm-gray text-sm mt-1">Fresh styles just dropped</p>
+                            <p className="label-tag mb-1">Just Dropped</p>
+                            <h2 className="display-heading text-2xl sm:text-3xl">New Arrivals</h2>
                         </div>
-                        <Link href="/women?filter=new" className="text-sm font-semibold flex items-center gap-1 hover:text-hm-red transition-colors">
-                            View All <ArrowRight size={14} />
+                        <Link href="/women?filter=new" className="text-[11px] font-semibold uppercase tracking-[0.12em] flex items-center gap-1 hover:text-hm-red transition-colors">
+                            View All <ArrowRight size={13} />
                         </Link>
                     </div>
                     <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 transition-opacity duration-300 ${!isHydrated ? "opacity-0" : "opacity-100"}`}>
@@ -57,11 +57,11 @@ export default function HomeProductSections() {
             <section className="max-w-[1400px] mx-auto px-4 py-10 sm:py-16" aria-label="Sale products">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-2">
                     <div>
-                        <h2 className="text-2xl sm:text-3xl font-bold text-hm-red">On Sale Now</h2>
-                        <p className="text-hm-gray text-sm mt-1">Discounts on selected styles</p>
+                        <p className="label-tag mb-1">Limited Time</p>
+                        <h2 className="display-heading text-2xl sm:text-3xl text-hm-red">On Sale Now</h2>
                     </div>
-                    <Link href="/sale" className="text-sm font-semibold flex items-center gap-1 text-hm-red hover:opacity-75 transition-opacity">
-                        Shop All Sale <ArrowRight size={14} />
+                    <Link href="/sale" className="text-[11px] font-semibold uppercase tracking-[0.12em] flex items-center gap-1 text-hm-red hover:opacity-75 transition-opacity">
+                        Shop All Sale <ArrowRight size={13} />
                     </Link>
                 </div>
                 <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 transition-opacity duration-300 ${!isHydrated ? "opacity-0" : "opacity-100"}`}>

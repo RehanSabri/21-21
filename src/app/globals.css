@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@400;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -25,11 +25,13 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Barlow', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
   color: var(--hm-dark);
   background-color: var(--hm-white);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.01em;
 }
 
 /* ===== SKIP LINK ===== */
@@ -333,15 +335,49 @@ body {
 }
 
 .section-header h2 {
-  font-size: clamp(24px, 4vw, 36px);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(28px, 4vw, 42px);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   margin-bottom: 8px;
 }
 
 .section-header p {
   color: var(--hm-gray);
-  font-size: 15px;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ===== EDITORIAL LABEL (odd ritual style) ===== */
+.label-tag {
+  display: inline-block;
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--hm-gray);
+}
+
+.label-tag::before { content: '( '; }
+.label-tag::after  { content: ' )'; }
+
+/* ===== DISPLAY HEADING (Barlow Condensed bold) ===== */
+.display-heading {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+}
+
+/* ===== SERIF ACCENT (Cormorant Garamond) ===== */
+.serif-accent {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
 }
 
 /* ===== BREADCRUMB ===== */
@@ -612,4 +648,71 @@ input[type="range"]::-webkit-slider-thumb {
 
 .quick-add-btn:hover {
   background: var(--hm-red);
+}
+
+/* ===== MODERN FOOTER ===== */
+.footer-modern {
+  background: #F0EDEA;
+  color: var(--hm-dark);
+  font-family: 'Barlow', sans-serif;
+}
+
+.footer-modern .footer-brand {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 0.9;
+  color: var(--hm-dark);
+}
+
+.footer-modern .footer-tagline {
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #888;
+  margin-top: 8px;
+}
+
+.footer-modern .footer-col-title {
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hm-dark);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ccc;
+}
+
+.footer-modern .footer-link {
+  display: block;
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #555;
+  text-decoration: none;
+  line-height: 2.2;
+  transition: color 0.2s;
+}
+
+.footer-modern .footer-link:hover {
+  color: var(--hm-dark);
+}
+
+.footer-modern .footer-bottom {
+  border-top: 1px solid #ccc;
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #888;
 }

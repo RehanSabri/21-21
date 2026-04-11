@@ -63,10 +63,10 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
                 <div className="relative h-full flex items-center px-5 lg:px-20">
                     <div className="max-w-xl animate-fadeIn">
-                        <p className="text-white/80 text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] mb-3 sm:mb-4">
+                        <p className="text-white/80 text-[10px] font-medium uppercase tracking-[0.3em] mb-3 sm:mb-4" style={{ fontFamily: "'Barlow', sans-serif" }}>
                             New Season Arrivals
                         </p>
-                        <h1 className="text-white text-4xl sm:text-5xl lg:text-7xl font-black leading-none mb-4 sm:mb-6" style={{ fontFamily: "Georgia, serif" }}>
+                        <h1 className="display-heading text-white text-5xl sm:text-6xl lg:text-8xl mb-4 sm:mb-6">
                             Spring<br />
                             <span className="text-hm-gold">2026</span>
                         </h1>
@@ -112,8 +112,9 @@ export default function HomePage() {
             {/* Category Cards */}
             <section className="max-w-[1400px] mx-auto px-4 py-16" aria-label="Shop by category">
                 <div className="section-header">
-                    <h2>Shop by Category</h2>
-                    <p>Explore our full range across all lifestyle needs</p>
+                    <p className="label-tag mb-3">Shop by Category</p>
+                    <h2>Explore Our Range</h2>
+                    <p>Women · Men · Kids · Home</p>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
                     {CATEGORIES.map((cat) => (
@@ -159,8 +160,8 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-black/60" />
                 <div className="relative z-10">
-                    <p className="text-white/70 text-xs uppercase tracking-[0.3em] mb-3">Limited Time</p>
-                    <h2 className="text-white text-3xl sm:text-4xl lg:text-6xl font-black mb-4" style={{ fontFamily: "Georgia, serif" }}>
+                    <p className="text-white/70 text-[10px] uppercase tracking-[0.3em] mb-3" style={{ fontFamily: "'Barlow', sans-serif" }}>Limited Time</p>
+                    <h2 className="display-heading text-white text-4xl sm:text-5xl lg:text-7xl mb-4">
                         UP TO 50% OFF
                     </h2>
                     <p className="text-white/80 mb-8 max-w-md mx-auto text-sm sm:text-base">
@@ -184,9 +185,10 @@ export default function HomePage() {
                     className="object-cover object-center opacity-30"
                 />
                 <div className="relative max-w-2xl mx-auto text-center px-4">
-                    <Leaf size={40} className="mx-auto mb-4 text-green-600" />
-                    <h2 className="text-3xl font-bold mb-4">Conscious Fashion</h2>
-                    <p className="text-hm-gray leading-relaxed mb-6">
+                    <Leaf size={36} className="mx-auto mb-4 text-green-600" />
+                    <p className="label-tag mb-3">Conscious Fashion</p>
+                    <h2 className="display-heading text-3xl sm:text-4xl mb-4">Conscious Fashion</h2>
+                    <p className="text-hm-gray leading-relaxed mb-6 text-sm" style={{ fontFamily: "'Barlow', sans-serif" }}>
                         We're committed to making more sustainable fashion choices accessible to everyone.
                         Our Conscious collection uses more sustainable materials and production processes.
                     </p>

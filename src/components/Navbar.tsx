@@ -163,8 +163,8 @@ export default function Navbar() {
     return (
         <>
             {/* Promo Banner */}
-            <div className="bg-hm-dark text-white text-center py-2 text-[10px] sm:text-xs font-medium tracking-widest uppercase px-4 truncate">
-                Free delivery on orders over ₹4,000 · Free returns on all orders
+            <div className="bg-hm-dark text-white text-center py-2 text-[10px] font-medium tracking-[0.2em] uppercase px-4 truncate" style={{ fontFamily: "'Barlow', sans-serif" }}>
+                Free delivery on orders over ₹4,000 &nbsp;·&nbsp; Free returns on all orders
             </div>
 
             {/* Main Navbar */}
@@ -187,8 +187,8 @@ export default function Navbar() {
                         {/* Logo */}
                         <Link
                             href="/"
-                            className="text-3xl font-black tracking-tight text-hm-dark hover:text-hm-red transition-colors"
-                            style={{ fontFamily: "Georgia, serif", letterSpacing: "-2px" }}
+                            className="text-[28px] font-black text-hm-dark hover:text-hm-red transition-colors tracking-tight"
+                            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, letterSpacing: "-1px" }}
                             aria-label="21:21 Home"
                         >
                             21:21
@@ -205,21 +205,23 @@ export default function Navbar() {
                                 >
                                     <Link
                                         href={link.href}
-                                        className={`flex items-center gap-1 px-3 py-5 text-sm font-semibold uppercase tracking-wider transition-colors hover:text-hm-red ${link.label === "Sale" ? "text-hm-red" : "text-hm-dark"
+                                        className={`flex items-center gap-1 px-3 py-5 text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors hover:text-hm-red ${link.label === "Sale" ? "text-hm-red" : "text-hm-dark"
                                             }`}
+                                        style={{ fontFamily: "'Barlow', sans-serif" }}
                                     >
                                         {link.label}
-                                        {link.sub.length > 0 && <ChevronDown size={14} />}
+                                        {link.sub.length > 0 && <ChevronDown size={12} />}
                                     </Link>
 
                                     {/* Dropdown */}
                                     {link.sub.length > 0 && activeDropdown === link.label && (
-                                        <div className="absolute top-full left-0 bg-white border-t-2 border-hm-red shadow-lg min-w-[200px] py-4 z-50 animate-slideDown">
+                                        <div className="absolute top-full left-0 bg-white border-t border-[#ddd] shadow-lg min-w-[200px] py-4 z-50 animate-slideDown">
                                             {link.sub.map((s) => (
                                                 <Link
                                                     key={s}
                                                     href={`${link.href}?sub=${encodeURIComponent(s)}`}
-                                                    className="block px-6 py-2 text-sm text-hm-dark hover:text-hm-red hover:bg-gray-50 transition-colors"
+                                                    className="block px-6 py-2.5 text-[11px] uppercase tracking-[0.1em] font-medium text-hm-gray hover:text-hm-dark hover:bg-gray-50 transition-colors"
+                                                    style={{ fontFamily: "'Barlow', sans-serif" }}
                                                 >
                                                     {s}
                                                 </Link>
@@ -434,7 +436,7 @@ export default function Navbar() {
                     <div className="overlay" onClick={() => setMobileOpen(false)} />
                     <div className="fixed top-0 left-0 h-full w-80 max-w-full bg-white z-50 flex flex-col animate-slideRight">
                         <div className="flex items-center justify-between p-4 border-b border-hm-border">
-                            <span className="text-2xl font-black" style={{ fontFamily: "Georgia, serif" }}>21:21</span>
+                            <span className="text-2xl font-black" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, letterSpacing: "-0.5px" }}>21:21</span>
                             <button onClick={() => setMobileOpen(false)} aria-label="Close menu"><X size={24} /></button>
                         </div>
                         <nav className="flex-1 overflow-y-auto py-4">
@@ -442,8 +444,9 @@ export default function Navbar() {
                                 <div key={link.label}>
                                     <Link
                                         href={link.href}
-                                        className={`block px-6 py-3 font-semibold uppercase tracking-wider text-sm ${link.label === "Sale" ? "text-hm-red" : "text-hm-dark"
+                                        className={`block px-6 py-3 font-semibold uppercase tracking-[0.14em] text-[12px] ${link.label === "Sale" ? "text-hm-red" : "text-hm-dark"
                                             }`}
+                                        style={{ fontFamily: "'Barlow', sans-serif" }}
                                         onClick={() => setMobileOpen(false)}
                                     >
                                         {link.label}
@@ -452,7 +455,8 @@ export default function Navbar() {
                                         <Link
                                             key={s}
                                             href={`${link.href}?sub=${encodeURIComponent(s)}`}
-                                            className="block px-10 py-2 text-sm text-hm-gray hover:text-hm-dark"
+                                            className="block px-10 py-2 text-[11px] tracking-[0.08em] uppercase text-hm-gray hover:text-hm-dark"
+                                            style={{ fontFamily: "'Barlow', sans-serif" }}
                                             onClick={() => setMobileOpen(false)}
                                         >
                                             {s}

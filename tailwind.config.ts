@@ -19,7 +19,10 @@ const config: Config = {
         "hm-gold": "#C8A96E",
       },
       fontFamily: {
-        sans: ["'HM Sans'", "Inter", "system-ui", "sans-serif"],
+        sans: ["'Barlow'", "system-ui", "sans-serif"],
+        barlow: ["'Barlow'", "system-ui", "sans-serif"],
+        condensed: ["'Barlow Condensed'", "sans-serif"],
+        serif: ["'Cormorant Garamond'", "Georgia", "serif"],
       },
       screens: {
         xs: "475px",

@@ -51,13 +51,13 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
                 <div className="product-card-image-wrapper">
                     {/* Badges */}
                     {product.isSale && (
-                        <span className="product-card-badge badge-sale">Sale</span>
+                        <span className="product-card-badge badge-sale" style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em" }}>Sale</span>
                     )}
                     {product.isNew && !product.isSale && (
-                        <span className="product-card-badge badge-new">New</span>
+                        <span className="product-card-badge badge-new" style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em" }}>New</span>
                     )}
                     {product.isBestSeller && !product.isNew && !product.isSale && (
-                        <span className="product-card-badge badge-bestseller">Best Seller</span>
+                        <span className="product-card-badge badge-bestseller" style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em" }}>Best Seller</span>
                     )}
 
                     <Image
@@ -88,7 +88,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
                             className="absolute inset-0 bg-white/95 z-10 flex flex-col items-center justify-center p-3 animate-fadeIn"
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         >
-                            <p className="text-xs font-semibold uppercase tracking-wider mb-3 text-hm-dark">Select Size</p>
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] mb-3 text-hm-dark" style={{ fontFamily: "'Barlow', sans-serif" }}>Select Size</p>
                             <div className="flex flex-wrap gap-1.5 justify-center">
                                 {product.sizes.map((size) => (
                                     <button
@@ -167,20 +167,21 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
                 )}
 
                 <Link href={`/${product.category}/${product.id}`}>
-                    <h3 className="text-sm font-medium leading-snug hover:text-hm-red transition-colors line-clamp-2">
+                    <h3 className="text-[13px] font-medium leading-snug hover:text-hm-red transition-colors line-clamp-2 tracking-[0.01em]" style={{ fontFamily: "'Barlow', sans-serif" }}>
                         {product.name}
                     </h3>
                 </Link>
 
                 <div className="flex items-center gap-2 mt-1">
                     {product.originalPrice && (
-                        <span className="text-sm text-hm-gray line-through">
+                        <span className="text-[12px] text-hm-gray line-through" style={{ fontFamily: "'Barlow', sans-serif" }}>
                             ₹{product.originalPrice.toLocaleString('en-IN')}
                         </span>
                     )}
                     <span
-                        className={`text-sm font-semibold ${product.isSale ? "text-hm-red" : "text-hm-dark"
+                        className={`text-[13px] font-semibold tracking-[0.01em] ${product.isSale ? "text-hm-red" : "text-hm-dark"
                             }`}
+                        style={{ fontFamily: "'Barlow', sans-serif" }}
                     >
                         ₹{product.price.toLocaleString('en-IN')}
                     </span>
